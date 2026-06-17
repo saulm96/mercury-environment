@@ -1,0 +1,108 @@
+{
+  "id": "3FHPC8fUVfnD5N8kDrDTLDtG2qA",
+  "version": "1",
+  "turboVersion": "2.9.18",
+  "monorepo": true,
+  "globalCacheInputs": {
+    "rootKey": "I can’t see ya, but I know you’re here",
+    "files": {},
+    "hashOfExternalDependencies": "2e7500d417c66689",
+    "hashOfInternalDependencies": "",
+    "environmentVariables": {
+      "specified": {
+        "env": [],
+        "passThroughEnv": null
+      },
+      "configured": [],
+      "inferred": [],
+      "passthrough": null
+    },
+    "engines": null
+  },
+  "execution": {
+    "command": "turbo run typecheck --filter=@mercury/shared",
+    "repoPath": "",
+    "success": 0,
+    "failed": 1,
+    "cached": 0,
+    "attempted": 1,
+    "startTime": 1781728889891,
+    "endTime": 1781728890164,
+    "exitCode": 1
+  },
+  "packages": [
+    "@mercury/shared"
+  ],
+  "envMode": "strict",
+  "frameworkInference": true,
+  "tasks": [
+    {
+      "taskId": "@mercury/shared#typecheck",
+      "task": "typecheck",
+      "package": "@mercury/shared",
+      "hash": "cb5bb60605877f28",
+      "inputs": {
+        "package.json": "4c05840c527dce407fafaf089a7aab6fe4b9c954",
+        "src/index.ts": "9a71c85c75848735bbcb0b19ad9b2873791fce5b",
+        "src/types/api-response.ts": "298f485996edfab4342c4c4ed50c71b7465ce572",
+        "src/types/transaction.ts": "99a413bf4517c1a3b22077e932f38b9a5289c1f6",
+        "src/types/user.ts": "f4e664953342dd80d6e5fda491e7a9e2e2979980",
+        "tsconfig.json": "5a24989cd30dcf3749ca7e60d4e83d6ddbb14714"
+      },
+      "hashOfExternalDependencies": "ccfc20db1f89ac42",
+      "cache": {
+        "local": false,
+        "remote": false,
+        "status": "MISS",
+        "timeSaved": 0
+      },
+      "command": "tsc --noEmit",
+      "cliArguments": [],
+      "outputs": null,
+      "excludedOutputs": null,
+      "logFile": "packages\\shared\\.turbo\\turbo-typecheck.log",
+      "directory": "packages\\shared",
+      "dependencies": [],
+      "dependents": [],
+      "with": [],
+      "resolvedTaskDefinition": {
+        "outputs": [],
+        "cache": true,
+        "dependsOn": [
+          "^typecheck"
+        ],
+        "inputs": [],
+        "outputLogs": "full",
+        "persistent": false,
+        "interruptible": false,
+        "env": [],
+        "passThroughEnv": null,
+        "interactive": false
+      },
+      "expandedOutputs": [],
+      "framework": "",
+      "envMode": "strict",
+      "environmentVariables": {
+        "specified": {
+          "env": [],
+          "passThroughEnv": null
+        },
+        "configured": [],
+        "inferred": [],
+        "passthrough": null
+      },
+      "execution": {
+        "startTime": 1781728889929,
+        "endTime": 1781728890163,
+        "error": "command (C:\\Users\\samoa\\Desktop\\mercury-environment\\packages\\shared) C:\\Program Files\\nodejs\\node.exe C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js run typecheck exited (1)",
+        "exitCode": 1
+      }
+    }
+  ],
+  "user": "",
+  "scm": {
+    "type": "git",
+    "sha": "e33ec994377645106e44cacd255250f8763b58d1",
+    "branch": "main"
+  }
+}

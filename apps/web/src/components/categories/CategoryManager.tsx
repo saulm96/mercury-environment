@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import type { Category } from '@mercury/shared';
+import { ConfirmDeleteModal } from './ConfirmDeleteModal';
 
 interface CategoryManagerProps {
   categories: Category[];
+  transactionCounts: Record<string, number>;
   onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   onDeleteCategory: (id: string) => Promise<void>;
 }
@@ -80,7 +82,7 @@ interface CategorySectionProps {
   type: 'income' | 'expense';
   items: Category[];
   onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
-  onDeleteCategory: (id: string) => Promise<void>;
+  onDeleteClick: (category: Category) => void;
 }
 
 function CategorySection({
@@ -88,7 +90,7 @@ function CategorySection({
   type,
   items,
   onCreateCategory,
-  onDeleteCategory,
+  onDeleteClick,
 }: CategorySectionProps) {
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -121,15 +123,7 @@ function CategorySection({
             {!cat.isFallback && (
               <button
                 type="button"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `All transactions in "${cat.name}" will be moved to "Others". Continue?`,
-                    )
-                  ) {
-                    onDeleteCategory(cat.id);
-                  }
-                }}
+                onClick={() => onDeleteClick(cat)}
                 className="flex-shrink-0 p-1.5 rounded-lg text-mercury-secondary hover:text-rose-600 hover:bg-rose-50 transition-all duration-200 cursor-pointer"
                 aria-label={`Delete category ${cat.name}`}
               >
@@ -191,28 +185,54 @@ function CategorySection({
 
 export function CategoryManager({
   categories,
+  transactionCounts,
   onCreateCategory,
   onDeleteCategory,
 }: CategoryManagerProps) {
   const expenseCategories = categories.filter((c) => c.type === 'expense');
   const incomeCategories = categories.filter((c) => c.type === 'income');
+  const [confirmingCategory, setConfirmingCategory] = useState<Category | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function handleConfirmDelete() {
+    if (!confirmingCategory) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteCategory(confirmingCategory.id);
+    } finally {
+      setIsDeleting(false);
+      setConfirmingCategory(null);
+    }
+  }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <CategorySection
-        title="Expense Categories"
-        type="expense"
-        items={expenseCategories}
-        onCreateCategory={onCreateCategory}
-        onDeleteCategory={onDeleteCategory}
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <CategorySection
+          title="Expense Categories"
+          type="expense"
+          items={expenseCategories}
+          onCreateCategory={onCreateCategory}
+          onDeleteClick={(cat) => setConfirmingCategory(cat)}
+        />
+        <CategorySection
+          title="Income Categories"
+          type="income"
+          items={incomeCategories}
+          onCreateCategory={onCreateCategory}
+          onDeleteClick={(cat) => setConfirmingCategory(cat)}
+        />
+      </div>
+
+      <ConfirmDeleteModal
+        isOpen={confirmingCategory !== null}
+        categoryName={confirmingCategory?.name ?? ''}
+        fallbackName={confirmingCategory?.type === 'expense' ? 'Others' : 'Other Income'}
+        affectedCount={transactionCounts[confirmingCategory?.id ?? ''] ?? 0}
+        isDeleting={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmingCategory(null)}
       />
-      <CategorySection
-        title="Income Categories"
-        type="income"
-        items={incomeCategories}
-        onCreateCategory={onCreateCategory}
-        onDeleteCategory={onDeleteCategory}
-      />
-    </div>
+    </>
   );
 }

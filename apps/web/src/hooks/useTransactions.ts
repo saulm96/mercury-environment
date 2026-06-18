@@ -29,6 +29,7 @@ interface UseTransactionsReturn {
   handleCreate: (data: TransactionFormData) => Promise<void>;
   handleUpdate: (id: string, data: TransactionFormData) => Promise<void>;
   handleCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
+  handleDeleteCategory: (id: string) => Promise<void>;
   openCreateModal: () => void;
   openEditModal: (tx: Transaction) => void;
   closeModal: () => void;
@@ -43,6 +44,7 @@ export function useTransactions(): UseTransactionsReturn {
     categories,
     loading: categoriesLoading,
     handleCreate: handleCreateCategory,
+    handleDelete: handleDeleteCategoryRaw,
   } = useCategories();
 
   const fetchTransactions = useCallback(async () => {
@@ -102,6 +104,14 @@ export function useTransactions(): UseTransactionsReturn {
     setModal({ open: false });
   }, []);
 
+  const handleDeleteCategory = useCallback(
+    async (id: string) => {
+      await handleDeleteCategoryRaw(id);
+      await fetchTransactions();
+    },
+    [handleDeleteCategoryRaw, fetchTransactions],
+  );
+
   useEffect(() => {
     fetchTransactions();
   }, [fetchTransactions]);
@@ -117,6 +127,7 @@ export function useTransactions(): UseTransactionsReturn {
     handleCreate,
     handleUpdate,
     handleCreateCategory,
+    handleDeleteCategory,
     openCreateModal,
     openEditModal,
     closeModal,

@@ -1,3 +1,5 @@
+import type { Category } from './category';
+
 export interface Transaction {
   id: string;
   userId: string;
@@ -5,7 +7,8 @@ export interface Transaction {
   amount: number;
   description: string;
   date: string;
-  category: string | null;
+  categoryId: string | null;
+  category?: Category | null;
   createdAt: Date;
   updatedAt: Date;
 }

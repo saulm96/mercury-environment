@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
-import type { Transaction, ApiResponse } from '@mercury/shared';
+import type { Transaction, Category, ApiResponse } from '@mercury/shared';
+import { useCategories } from './useCategories';
 
 interface TransactionFormData {
   type: 'income' | 'expense';
   amount: number;
   description: string;
   date: string;
-  category?: string;
+  categoryId?: string;
 }
 
 interface ModalState {
@@ -22,9 +23,12 @@ interface UseTransactionsReturn {
   loading: boolean;
   error: string | null;
   modal: ModalState;
+  categories: Category[];
+  categoriesLoading: boolean;
   fetchTransactions: () => Promise<void>;
   handleCreate: (data: TransactionFormData) => Promise<void>;
   handleUpdate: (id: string, data: TransactionFormData) => Promise<void>;
+  handleCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   openCreateModal: () => void;
   openEditModal: (tx: Transaction) => void;
   closeModal: () => void;
@@ -35,6 +39,11 @@ export function useTransactions(): UseTransactionsReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState>({ open: false });
+  const {
+    categories,
+    loading: categoriesLoading,
+    handleCreate: handleCreateCategory,
+  } = useCategories();
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -102,9 +111,12 @@ export function useTransactions(): UseTransactionsReturn {
     loading,
     error,
     modal,
+    categories,
+    categoriesLoading,
     fetchTransactions,
     handleCreate,
     handleUpdate,
+    handleCreateCategory,
     openCreateModal,
     openEditModal,
     closeModal,

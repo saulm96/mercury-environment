@@ -11,9 +11,11 @@ export default function TransactionsPage() {
     loading,
     error,
     modal,
+    categories,
     fetchTransactions,
     handleCreate,
     handleUpdate,
+    handleCreateCategory,
     openCreateModal,
     openEditModal,
     closeModal,
@@ -49,6 +51,8 @@ export default function TransactionsPage() {
       <TransactionModal
         isOpen={modal.open}
         transaction={modal.transaction}
+        categories={categories}
+        onCreateCategory={handleCreateCategory}
         onClose={closeModal}
         onSubmit={
           modal.transaction

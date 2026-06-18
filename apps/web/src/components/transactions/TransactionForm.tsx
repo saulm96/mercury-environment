@@ -1,17 +1,21 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import type { Category } from '@mercury/shared';
+import { CategorySelect } from '@/components/categories/CategorySelect';
 
 export interface TransactionFormData {
   type: 'income' | 'expense';
   amount: number;
   description: string;
   date: string;
-  category?: string;
+  categoryId?: string;
 }
 
 interface TransactionFormProps {
   initialValues?: Partial<TransactionFormData>;
+  categories: Category[];
+  onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   onSubmit: (data: TransactionFormData) => Promise<void>;
   onCancel: () => void;
 }
@@ -22,7 +26,13 @@ interface FormErrors {
   date?: string;
 }
 
-export function TransactionForm({ initialValues, onSubmit, onCancel }: TransactionFormProps) {
+export function TransactionForm({
+  initialValues,
+  categories,
+  onCreateCategory,
+  onSubmit,
+  onCancel,
+}: TransactionFormProps) {
   const [type, setType] = useState<'income' | 'expense'>(
     initialValues?.type ?? 'expense',
   );
@@ -31,7 +41,9 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
   const [date, setDate] = useState(
     initialValues?.date?.split('T')[0] ?? new Date().toISOString().split('T')[0],
   );
-  const [category, setCategory] = useState(initialValues?.category ?? '');
+  const [categoryId, setCategoryId] = useState<string | null>(
+    initialValues?.categoryId ?? null,
+  );
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -66,7 +78,7 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
         amount: Number(amount),
         description: description.trim(),
         date,
-        category: category.trim() || undefined,
+        categoryId: categoryId ?? undefined,
       });
     } catch (err) {
       setSubmitError(
@@ -200,13 +212,13 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
           Category{' '}
           <span className="text-mercury-secondary font-normal">(optional)</span>
         </label>
-        <input
-          id="category"
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="e.g., Food, Utilities"
-          className="w-full px-3 py-3 border border-gray-200 rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 focus:border-mercury-primary"
+        <CategorySelect
+          categories={categories}
+          type={type}
+          value={categoryId}
+          onChange={setCategoryId}
+          onCreateCategory={onCreateCategory}
+          disabled={isSubmitting}
         />
       </div>
 

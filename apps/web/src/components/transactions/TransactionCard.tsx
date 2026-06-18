@@ -77,11 +77,27 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
       {/* Bottom row: category badge + amount */}
       <div className="flex items-center justify-between">
         {transaction.category ? (
-          <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-mercury-secondary">
-            {transaction.category}
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full"
+            style={{
+              backgroundColor: transaction.category.color
+                ? `${transaction.category.color}18`
+                : '#F3F4F6',
+              color: transaction.category.color ?? '#6B7280',
+            }}
+          >
+            {transaction.category.color && (
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: transaction.category.color }}
+              />
+            )}
+            {transaction.category.name}
           </span>
         ) : (
-          <span />
+          <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-mercury-secondary/60">
+            Uncategorized
+          </span>
         )}
         <span
           className={`text-lg font-semibold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}

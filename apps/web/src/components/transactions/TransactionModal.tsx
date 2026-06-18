@@ -1,12 +1,14 @@
 'use client';
 
-import type { Transaction } from '@mercury/shared';
+import type { Transaction, Category } from '@mercury/shared';
 import { TransactionForm } from './TransactionForm';
 import type { TransactionFormData } from './TransactionForm';
 
 interface TransactionModalProps {
   isOpen: boolean;
   transaction?: Transaction;
+  categories: Category[];
+  onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   onClose: () => void;
   onSubmit: (data: TransactionFormData) => Promise<void>;
 }
@@ -14,6 +16,8 @@ interface TransactionModalProps {
 export function TransactionModal({
   isOpen,
   transaction,
+  categories,
+  onCreateCategory,
   onClose,
   onSubmit,
 }: TransactionModalProps) {
@@ -42,10 +46,12 @@ export function TransactionModal({
                   amount: transaction.amount,
                   description: transaction.description,
                   date: transaction.date,
-                  category: transaction.category ?? '',
+                  categoryId: transaction.categoryId ?? undefined,
                 }
               : undefined
           }
+          categories={categories}
+          onCreateCategory={onCreateCategory}
           onSubmit={onSubmit}
           onCancel={onClose}
         />

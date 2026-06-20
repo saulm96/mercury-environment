@@ -1,8 +1,7 @@
-'use client';
-
 import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from 'react';
 import type { Category } from '@mercury/shared';
 import { PlusIcon } from '@/components/icons';
+import styles from './CategorySelect.module.css';
 
 interface CategorySelectProps {
   categories: Category[];
@@ -41,7 +40,6 @@ export function CategorySelect({
 
   const selectedCategory = categories.find((c) => c.id === value) ?? null;
 
-  // Filter categories by type and query
   const filtered = categories.filter(
     (c) =>
       c.type === type &&
@@ -54,7 +52,6 @@ export function CategorySelect({
 
   const showCreateOption = query.trim().length > 0 && !exactMatch;
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -67,7 +64,6 @@ export function CategorySelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Reset query when value changes externally
   useEffect(() => {
     if (selectedCategory) {
       setQuery(selectedCategory.name);
@@ -76,7 +72,6 @@ export function CategorySelect({
     }
   }, [value, selectedCategory]);
 
-  // Reset highlighted index when filtered list changes
   useEffect(() => {
     setHighlightedIndex(-1);
   }, [filtered.length, showCreateOption]);
@@ -145,7 +140,6 @@ export function CategorySelect({
     [isOpen, filtered, showCreateOption, highlightedIndex, selectCategory, handleCreate],
   );
 
-  // Scroll highlighted option into view
   useEffect(() => {
     if (highlightedIndex >= 0 && listRef.current) {
       const items = listRef.current.children;
@@ -156,13 +150,18 @@ export function CategorySelect({
   }, [highlightedIndex]);
 
   const displayValue = selectedCategory ? selectedCategory.name : '';
+  const inputClasses = [
+    styles.input,
+    selectedCategory?.color ? styles.inputWithColor : '',
+    disabled ? styles.inputDisabled : '',
+  ].filter(Boolean).join(' ');
 
   return (
-    <div ref={containerRef} className="relative">
-      <div className="relative">
+    <div ref={containerRef} className={styles.container}>
+      <div className={styles.inputWrapper}>
         {selectedCategory?.color && (
           <span
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+            className={styles.colorDot}
             style={{ backgroundColor: selectedCategory.color }}
           />
         )}
@@ -179,23 +178,14 @@ export function CategorySelect({
           onKeyDown={handleKeyDown}
           placeholder={selectedCategory ? '' : 'Search or create category...'}
           disabled={disabled}
-          className={`w-full py-3 border border-gray-200 rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 focus:border-mercury-primary ${
-            selectedCategory?.color ? 'pl-8 pr-3' : 'px-3'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={inputClasses}
         />
       </div>
 
-      {/* Dropdown */}
       {isOpen && !disabled && (
-        <ul
-          ref={listRef}
-          role="listbox"
-          className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-mercury-lg max-h-56 overflow-y-auto"
-        >
+        <ul ref={listRef} role="listbox" className={styles.dropdown}>
           {filtered.length === 0 && !showCreateOption && (
-            <li className="px-3 py-3 text-sm text-mercury-secondary text-center">
-              No categories found
-            </li>
+            <li className={styles.emptyItem}>No categories found</li>
           )}
 
           {filtered.map((cat, index) => (
@@ -205,19 +195,19 @@ export function CategorySelect({
               aria-selected={cat.id === value}
               onClick={() => selectCategory(cat.id)}
               onMouseEnter={() => setHighlightedIndex(index)}
-              className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer text-sm transition-colors duration-150 ${
-                highlightedIndex === index
-                  ? 'bg-mercury-primary/5'
-                  : 'hover:bg-gray-50'
-              } ${cat.id === value ? 'bg-mercury-primary/5 font-medium' : ''}`}
+              className={[
+                styles.option,
+                highlightedIndex === index ? styles.optionHighlighted : '',
+                cat.id === value ? styles.optionSelected : '',
+              ].filter(Boolean).join(' ')}
             >
               <span
-                className="w-3 h-3 rounded-full flex-shrink-0"
+                className={styles.optionColorDot}
                 style={{ backgroundColor: cat.color ?? '#D1D5DB' }}
               />
-              <span className="text-mercury-text truncate">{cat.name}</span>
+              <span className={styles.optionName}>{cat.name}</span>
               {cat.isFallback && (
-                <span className="ml-auto text-xs text-mercury-secondary">default</span>
+                <span className={styles.optionDefault}>default</span>
               )}
             </li>
           ))}
@@ -231,21 +221,18 @@ export function CategorySelect({
                 onClick={handleCreate}
                 onMouseEnter={() => setHighlightedIndex(filtered.length)}
                 disabled={isCreating}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 cursor-pointer text-sm transition-colors duration-150 border-t border-gray-100 ${
-                  highlightedIndex === filtered.length
-                    ? 'bg-blue-50'
-                    : 'hover:bg-blue-50'
-                } ${isCreating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={[
+                  styles.createButton,
+                  highlightedIndex === filtered.length ? styles.createButtonHighlighted : '',
+                ].filter(Boolean).join(' ')}
               >
-                <PlusIcon className="w-4 h-4 text-mercury-cta flex-shrink-0" />
-                <span className="text-mercury-cta font-medium">
+                <PlusIcon className={styles.createIcon} />
+                <span className={styles.createText}>
                   {isCreating ? 'Creating...' : `Create "${query.trim()}"`}
                 </span>
               </button>
               {createError && (
-                <p className="px-3 py-1.5 text-xs text-rose-600 bg-rose-50">
-                  {createError}
-                </p>
+                <p className={styles.createError}>{createError}</p>
               )}
             </li>
           )}

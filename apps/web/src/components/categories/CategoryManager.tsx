@@ -1,9 +1,8 @@
-'use client';
-
 import { useState } from 'react';
 import type { Category } from '@mercury/shared';
 import { ConfirmDeleteModal } from './ConfirmDeleteModal';
 import { TrashIcon, PlusIcon } from '@/components/icons';
+import styles from './CategoryManager.module.css';
 
 interface CategoryManagerProps {
   categories: Category[];
@@ -49,19 +48,19 @@ function AddCategoryForm({ type, onSubmit, onCancel }: AddFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-3">
+    <form onSubmit={handleSubmit} className={styles.addForm}>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Category name..."
         autoFocus
-        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 focus:border-mercury-primary"
+        className={styles.addFormInput}
       />
       <button
         type="submit"
         disabled={isSubmitting || !name.trim()}
-        className="px-3 py-2 bg-mercury-cta text-white text-sm font-semibold rounded-lg transition-all duration-200 hover:opacity-90 disabled:opacity-50 cursor-pointer whitespace-nowrap"
+        className={styles.addFormSubmit}
       >
         {isSubmitting ? '...' : 'Add'}
       </button>
@@ -69,11 +68,11 @@ function AddCategoryForm({ type, onSubmit, onCancel }: AddFormProps) {
         type="button"
         onClick={onCancel}
         disabled={isSubmitting}
-        className="px-3 py-2 border border-gray-200 text-mercury-secondary text-sm rounded-lg transition-all duration-200 hover:bg-gray-50 disabled:opacity-50 cursor-pointer"
+        className={styles.addFormCancel}
       >
         Cancel
       </button>
-      {error && <p className="text-rose-500 text-xs">{error}</p>}
+      {error && <p className={styles.addFormError}>{error}</p>}
     </form>
   );
 }
@@ -97,35 +96,30 @@ function CategorySection({
 
   return (
     <div>
-      <h3 className="text-lg font-heading text-mercury-text mb-4">{title}</h3>
+      <h3 className={styles.sectionHeading}>{title}</h3>
 
       {items.length === 0 && !showAddForm && (
-        <p className="text-sm text-mercury-secondary mb-3">
-          No {type} categories yet.
-        </p>
+        <p className={styles.empty}>No {type} categories yet.</p>
       )}
 
-      <ul className="space-y-2">
+      <ul className={styles.categoryList}>
         {items.map((cat) => (
-          <li
-            key={cat.id}
-            className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg bg-mercury-background border border-gray-100 transition-all duration-200"
-          >
-            <div className="flex items-center gap-3 min-w-0">
+          <li key={cat.id} className={styles.categoryItem}>
+            <div className={styles.categoryLeft}>
               <span
-                className="w-3.5 h-3.5 rounded-full flex-shrink-0"
+                className={styles.categoryDot}
                 style={{ backgroundColor: cat.color ?? '#D1D5DB' }}
               />
-              <span className="text-sm text-mercury-text truncate">{cat.name}</span>
+              <span className={styles.categoryName}>{cat.name}</span>
               {cat.isFallback && (
-                <span className="text-xs text-mercury-secondary flex-shrink-0">(default)</span>
+                <span className={styles.defaultBadge}>(default)</span>
               )}
             </div>
             {!cat.isFallback && (
               <button
                 type="button"
                 onClick={() => onDeleteClick(cat)}
-                className="flex-shrink-0 p-1.5 rounded-lg text-mercury-secondary hover:text-rose-600 hover:bg-rose-50 transition-all duration-200 cursor-pointer"
+                className={styles.deleteButton}
                 aria-label={`Delete category ${cat.name}`}
               >
                 <TrashIcon />
@@ -148,7 +142,7 @@ function CategorySection({
         <button
           type="button"
           onClick={() => setShowAddForm(true)}
-          className="mt-3 flex items-center gap-2 text-sm text-mercury-cta font-medium hover:underline transition-all duration-200 cursor-pointer"
+          className={styles.addButton}
         >
           <PlusIcon />
           Add Category
@@ -182,7 +176,7 @@ export function CategoryManager({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className={styles.grid}>
         <CategorySection
           title="Expense Categories"
           type="expense"

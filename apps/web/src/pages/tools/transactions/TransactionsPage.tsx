@@ -1,11 +1,10 @@
-'use client';
-
 import { useEffect, useState, useMemo } from 'react';
 import { useTransactions } from '@/hooks/useTransactions';
 import { TransactionCardList } from '@/components/transactions/TransactionCardList';
 import { TransactionModal } from '@/components/transactions/TransactionModal';
 import { CategoryManager } from '@/components/categories/CategoryManager';
 import { BulletListIcon, CloseIcon } from '@/components/icons';
+import styles from './TransactionsPage.module.css';
 
 export default function TransactionsPage() {
   const {
@@ -41,28 +40,23 @@ export default function TransactionsPage() {
   }, [fetchTransactions]);
 
   return (
-    <main className="p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-heading text-mercury-text">Transactions</h1>
-        <div className="flex items-center gap-3">
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.heading}>Transactions</h1>
+        <div className={styles.actions}>
           <button
             onClick={() => setShowCategoryManager(true)}
-            className="p-2.5 rounded-lg border-2 border-mercury-primary text-mercury-primary transition-all duration-200 hover:bg-mercury-primary hover:text-white cursor-pointer"
+            className={styles.categoryButton}
             aria-label="Manage Categories"
           >
             <BulletListIcon />
           </button>
-          <button
-            onClick={openCreateModal}
-            className="bg-mercury-cta text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:-translate-y-px cursor-pointer"
-          >
+          <button onClick={openCreateModal} className={styles.createButton}>
             New Transaction
           </button>
         </div>
       </div>
 
-      {/* Transaction list */}
       <TransactionCardList
         transactions={transactions}
         loading={loading}
@@ -71,7 +65,6 @@ export default function TransactionsPage() {
         onCreateClick={openCreateModal}
       />
 
-      {/* Transaction Modal */}
       <TransactionModal
         isOpen={modal.open}
         transaction={modal.transaction}
@@ -85,24 +78,20 @@ export default function TransactionsPage() {
         }
       />
 
-      {/* Category Manager Modal */}
       {showCategoryManager && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          className={styles.modalOverlay}
           onClick={() => setShowCategoryManager(false)}
           role="dialog"
           aria-modal="true"
           aria-label="Manage Categories"
         >
-          <div
-            className="bg-white rounded-modal p-8 shadow-mercury-xl max-w-[700px] w-full max-h-[90vh] overflow-y-auto transition-all duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-heading text-mercury-text">Manage Categories</h2>
+          <div className={styles.modalPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalHeading}>Manage Categories</h2>
               <button
                 onClick={() => setShowCategoryManager(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                className={styles.closeButton}
                 aria-label="Close"
               >
                 <CloseIcon className="w-5 h-5 text-mercury-secondary" />

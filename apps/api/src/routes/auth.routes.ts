@@ -30,7 +30,7 @@ router.get(
   }
 );
 
-router.get('/logout', (req: Request, res: Response) => {
+router.post('/logout', (req: Request, res: Response) => {
   const cookieDomain = process.env.COOKIE_DOMAIN ?? 'localhost';
   res.clearCookie('token', {
     httpOnly: true,

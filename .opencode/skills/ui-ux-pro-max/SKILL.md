@@ -45,7 +45,7 @@ Extract key information from user request:
 - **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
 - **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
 - **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: Next.js App Router (default for Mercury environment)
+- **Stack**: React with Vite (default for Mercury environment)
 
 ### Step 2: Generate Design System (REQUIRED)
 
@@ -109,12 +109,12 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n
 | Alternative fonts | `typography` | `--domain typography "elegant luxury"` |
 | Landing structure | `landing` | `--domain landing "hero social-proof"` |
 
-### Step 4: Stack Guidelines (Default: nextjs)
+### Step 4: Stack Guidelines (Default: react)
 
-Get implementation-specific best practices. If user doesn't specify a stack, **default to `nextjs`**.
+Get implementation-specific best practices. If user doesn't specify a stack, **default to `react`**.
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack nextjs
+python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack react
 ```
 
 Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
@@ -163,7 +163,7 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 - Product type: Beauty/Spa service
 - Style keywords: elegant, professional, soft
 - Industry: Beauty/Wellness
-- Stack: nextjs (default)
+- Stack: react (default)
 
 ### Step 2: Generate Design System (REQUIRED)
 

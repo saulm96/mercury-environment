@@ -1,0 +1,19 @@
+.main {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.button {
+  border-radius: 4px;
+  background-color: #2563EB;
+  padding: 12px 24px;
+  color: white;
+  text-decoration: none;
+  transition: var(--transition-all);
+}
+
+.button:hover {
+  background-color: #1D4ED8;
+}

@@ -1,0 +1,99 @@
+.card {
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-all);
+  cursor: pointer;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: 12px;
+}
+
+.iconIncome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #D1FAE5;
+  color: #059669;
+}
+
+.iconExpense {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #FFE4E6;
+  color: #DC2626;
+}
+
+.date {
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+}
+
+.description {
+  color: var(--color-text);
+  font-weight: 500;
+  margin-bottom: var(--space-sm);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+}
+
+.categoryDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.uncategorized {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  background-color: #F3F4F6;
+  color: rgba(63, 63, 70, 0.6);
+}
+
+.amount {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.amountPositive {
+  color: #059669;
+}
+
+.amountNegative {
+  color: #DC2626;
+}

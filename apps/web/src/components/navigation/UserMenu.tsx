@@ -1,7 +1,6 @@
-'use client';
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { User } from '@mercury/shared';
+import styles from './UserMenu.module.css';
 
 interface UserMenuProps {
   user: User | null;
@@ -13,11 +12,10 @@ export function UserMenu({ user, loading }: UserMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = useCallback(async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
     window.location.href = '/';
   }, []);
 
-  // Close dropdown on click outside
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
@@ -34,14 +32,13 @@ export function UserMenu({ user, loading }: UserMenuProps) {
     : '?';
 
   return (
-    <div ref={menuRef} className="relative">
-      {/* Avatar */}
+    <div ref={menuRef} className={styles.wrapper}>
       {loading ? (
-        <div className="animate-pulse bg-gray-200 rounded-full w-9 h-9" />
+        <div className={styles.avatarSkeleton} />
       ) : (
         <button
           onClick={() => setOpen(!open)}
-          className="w-9 h-9 rounded-full bg-mercury-cta text-white flex items-center justify-center text-sm font-semibold cursor-pointer transition-all duration-200 hover:opacity-90"
+          className={styles.avatar}
           aria-label="User menu"
           aria-expanded={open}
         >
@@ -49,27 +46,19 @@ export function UserMenu({ user, loading }: UserMenuProps) {
         </button>
       )}
 
-      {/* Dropdown */}
       {open && user && (
         <>
-          {/* Click-capture backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-card shadow-mercury-lg border border-gray-100 z-50">
-            <div className="px-4 pt-4 pb-2">
+          <div className={styles.backdrop} onClick={() => setOpen(false)} />
+          <div className={styles.dropdown}>
+            <div className={styles.userInfo}>
               {user.name && (
-                <p className="font-semibold text-sm text-mercury-text">{user.name}</p>
+                <p className={styles.userName}>{user.name}</p>
               )}
-              <p className="text-xs text-mercury-secondary">{user.email}</p>
+              <p className={styles.userEmail}>{user.email}</p>
             </div>
-            <hr className="border-gray-100 my-2" />
-            <div className="px-2 pb-2">
-              <button
-                onClick={handleSignOut}
-                className="text-sm text-rose-600 hover:bg-rose-50 w-full text-left px-4 py-2 rounded-lg transition-colors cursor-pointer"
-              >
+            <hr className={styles.divider} />
+            <div className={styles.signOutArea}>
+              <button onClick={handleSignOut} className={styles.signOutButton}>
                 Sign Out
               </button>
             </div>

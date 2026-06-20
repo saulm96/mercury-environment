@@ -1,6 +1,7 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useCategories } from '../src/hooks/useCategories';
 import { api } from '../src/lib/api';
+import type { Category } from '@mercury/shared';
 
 jest.mock('../src/lib/api');
 const mockedApi = api as jest.Mocked<typeof api>;
@@ -88,7 +89,7 @@ describe('useCategories', () => {
     // Set up the second get call for after creation
     mockedApi.get.mockResolvedValue({ success: true, data: [...mockCategories, newCategory] });
 
-    let created: typeof newCategory | undefined;
+    let created: Category | undefined;
     await act(async () => {
       created = await result.current.handleCreate('Groceries', 'expense', '#FFE66D');
     });

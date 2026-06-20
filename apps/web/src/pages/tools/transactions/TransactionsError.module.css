@@ -1,0 +1,22 @@
+.main {
+  padding: var(--space-xl);
+}
+
+.error {
+  color: #DC2626;
+}
+
+.button {
+  margin-top: var(--space-md);
+  border-radius: 4px;
+  background-color: #2563EB;
+  padding: 8px 16px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.button:hover {
+  background-color: #1D4ED8;
+}

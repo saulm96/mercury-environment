@@ -64,7 +64,7 @@ Verify that the new code complies with:
 - [ ] Components do not hold server state locally (no `useState` for API data).
 - [ ] Hooks return objects with `isLoading` and `error`.
 - [ ] Domain types come from `@mercury/shared`, not redefined locally.
-- [ ] `loading.tsx` and `error.tsx` exist for each new route.
+- [ ] Suspense boundaries and Error Boundaries are implemented for each new page.
 
 ### 6. Production build
 

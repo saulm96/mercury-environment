@@ -1,0 +1,176 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sectionHeading {
+  font-size: 1.125rem;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+}
+
+.empty {
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+  margin-bottom: 12px;
+}
+
+.categoryList {
+  list-style: none;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background);
+  border: 1px solid #F3F4F6;
+  transition: var(--transition-all);
+}
+
+.categoryItem:not(:last-child) {
+  margin-bottom: var(--space-sm);
+}
+
+.categoryLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.categoryDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.categoryName {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.defaultBadge {
+  font-size: 0.75rem;
+  color: var(--color-secondary);
+  flex-shrink: 0;
+}
+
+.deleteButton {
+  flex-shrink: 0;
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: none;
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.deleteButton:hover {
+  color: #DC2626;
+  background-color: #FFF1F2;
+}
+
+.addButton {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--color-cta);
+  font-weight: 500;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.addButton:hover {
+  text-decoration: underline;
+}
+
+.addForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: 12px;
+}
+
+.addFormInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  transition: var(--transition-all);
+  outline: none;
+}
+
+.addFormInput:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.1);
+}
+
+.addFormSubmit {
+  padding: 8px 12px;
+  background-color: var(--color-cta);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-all);
+}
+
+.addFormSubmit:hover {
+  opacity: 0.9;
+}
+
+.addFormSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addFormCancel {
+  padding: 8px 12px;
+  border: 1px solid #E5E7EB;
+  color: var(--color-secondary);
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  background: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.addFormCancel:hover {
+  background-color: #F9FAFB;
+}
+
+.addFormCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addFormError {
+  color: #F43F5E;
+  font-size: 0.75rem;
+}

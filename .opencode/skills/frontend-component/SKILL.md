@@ -88,5 +88,5 @@ export function ExpensesList() {
 - ❌ `localStorage` or `sessionStorage`.
 - ❌ Data transformation logic (that belongs in the hook or `src/lib/`).
 - ❌ `console.log` in components going to production.
-- ❌ Inline styles (`style={{ color: 'red' }}`). Always Tailwind.
+- ❌ Inline styles (`style={{ color: 'red' }}`). Always CSS Modules (`.module.css`).
 - ❌ Hardcoded color values — use CSS variables (`--color-primary`, `--color-cta`, `--space-md`, etc.) from `design-system/mercury/MASTER.md`.

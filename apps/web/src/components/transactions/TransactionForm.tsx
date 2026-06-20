@@ -1,9 +1,8 @@
-'use client';
-
 import { useState, type FormEvent } from 'react';
 import type { Category } from '@mercury/shared';
 import { CategorySelect } from '@/components/categories/CategorySelect';
 import { SpinnerIcon } from '@/components/icons';
+import styles from './TransactionForm.module.css';
 
 export interface TransactionFormData {
   type: 'income' | 'expense';
@@ -90,51 +89,36 @@ export function TransactionForm({
     }
   }
 
+  const incomeToggle = [
+    styles.toggle,
+    type === 'income' ? styles.toggleIncome : styles.toggleInactive,
+  ].join(' ');
+
+  const expenseToggle = [
+    styles.toggle,
+    type === 'expense' ? styles.toggleExpense : styles.toggleInactive,
+  ].join(' ');
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Type toggle */}
-      <div>
-        <label className="block text-sm font-medium text-mercury-text mb-2">
-          Type
-        </label>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setType('income')}
-            className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer ${
-              type === 'income'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-gray-100 text-mercury-secondary hover:bg-gray-200'
-            }`}
-          >
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.field}>
+        <label className={`${styles.label} ${styles.labelSmall}`}>Type</label>
+        <div className={styles.toggleGroup}>
+          <button type="button" onClick={() => setType('income')} className={incomeToggle}>
             Income
           </button>
-          <button
-            type="button"
-            onClick={() => setType('expense')}
-            className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer ${
-              type === 'expense'
-                ? 'bg-rose-600 text-white'
-                : 'bg-gray-100 text-mercury-secondary hover:bg-gray-200'
-            }`}
-          >
+          <button type="button" onClick={() => setType('expense')} className={expenseToggle}>
             Expense
           </button>
         </div>
       </div>
 
-      {/* Amount */}
-      <div>
-        <label
-          htmlFor="amount"
-          className="block text-sm font-medium text-mercury-text mb-1.5"
-        >
+      <div className={styles.field}>
+        <label htmlFor="amount" className={`${styles.label} ${styles.labelSmall}`}>
           Amount
         </label>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mercury-secondary text-sm">
-            $
-          </span>
+        <div className={styles.inputWrapper}>
+          <span className={styles.currencySymbol}>$</span>
           <input
             id="amount"
             type="number"
@@ -143,24 +127,18 @@ export function TransactionForm({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className={`w-full pl-8 pr-3 py-3 border rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 ${
-              errors.amount
-                ? 'border-rose-500'
-                : 'border-gray-200 focus:border-mercury-primary'
-            }`}
+            className={[
+              styles.textInput,
+              styles.numberInput,
+              errors.amount ? styles.inputError : '',
+            ].filter(Boolean).join(' ')}
           />
         </div>
-        {errors.amount && (
-          <p className="text-rose-500 text-xs mt-1">{errors.amount}</p>
-        )}
+        {errors.amount && <p className={styles.fieldError}>{errors.amount}</p>}
       </div>
 
-      {/* Description */}
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-mercury-text mb-1.5"
-        >
+      <div className={styles.field}>
+        <label htmlFor="description" className={`${styles.label} ${styles.labelSmall}`}>
           Description
         </label>
         <input
@@ -169,23 +147,16 @@ export function TransactionForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="e.g., Coffee, Salary"
-          className={`w-full px-3 py-3 border rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 ${
-            errors.description
-              ? 'border-rose-500'
-              : 'border-gray-200 focus:border-mercury-primary'
-          }`}
+          className={[
+            styles.textInput,
+            errors.description ? styles.inputError : '',
+          ].filter(Boolean).join(' ')}
         />
-        {errors.description && (
-          <p className="text-rose-500 text-xs mt-1">{errors.description}</p>
-        )}
+        {errors.description && <p className={styles.fieldError}>{errors.description}</p>}
       </div>
 
-      {/* Date */}
-      <div>
-        <label
-          htmlFor="date"
-          className="block text-sm font-medium text-mercury-text mb-1.5"
-        >
+      <div className={styles.field}>
+        <label htmlFor="date" className={`${styles.label} ${styles.labelSmall}`}>
           Date
         </label>
         <input
@@ -193,25 +164,17 @@ export function TransactionForm({
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className={`w-full px-3 py-3 border rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 ${
-            errors.date
-              ? 'border-rose-500'
-              : 'border-gray-200 focus:border-mercury-primary'
-          }`}
+          className={[
+            styles.textInput,
+            errors.date ? styles.inputError : '',
+          ].filter(Boolean).join(' ')}
         />
-        {errors.date && (
-          <p className="text-rose-500 text-xs mt-1">{errors.date}</p>
-        )}
+        {errors.date && <p className={styles.fieldError}>{errors.date}</p>}
       </div>
 
-      {/* Category */}
-      <div>
-        <label
-          htmlFor="category"
-          className="block text-sm font-medium text-mercury-text mb-1.5"
-        >
-          Category{' '}
-          <span className="text-mercury-secondary font-normal">(optional)</span>
+      <div className={styles.field}>
+        <label className={styles.label}>
+          Category <span className={styles.labelOptional}>(optional)</span>
         </label>
         <CategorySelect
           categories={categories}
@@ -223,27 +186,23 @@ export function TransactionForm({
         />
       </div>
 
-      {/* Submit error */}
       {submitError && (
-        <div className="p-3 rounded-lg bg-rose-50 text-rose-600 text-sm">
-          {submitError}
-        </div>
+        <div className={styles.submitError}>{submitError}</div>
       )}
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-2">
+      <div className={styles.actions}>
         <button
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="flex-1 py-2.5 px-4 rounded-lg border-2 border-mercury-primary text-mercury-primary font-semibold text-sm transition-all duration-200 hover:bg-mercury-primary hover:text-white disabled:opacity-50 cursor-pointer"
+          className={styles.cancelButton}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 py-2.5 px-4 rounded-lg bg-mercury-cta text-white font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:-translate-y-px disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+          className={styles.submitButton}
         >
           {isSubmitting && <SpinnerIcon />}
           {initialValues?.description ? 'Save Changes' : 'Create Transaction'}

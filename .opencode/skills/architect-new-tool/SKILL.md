@@ -19,7 +19,7 @@ Answer these questions in a design document (`.opencode/tools/<tool-name>/design
 2. **Data entities** — What new models are needed? Does it reuse any existing model?
 3. **Relationships** — How does it relate to `User`? To other tools?
 4. **Required endpoints** — List the REST endpoints (method + route + description) before the Backend Agent starts.
-5. **Required pages** — List the Next.js routes before the Frontend Agent starts.
+5. **Required pages** — List the React Router paths before the Frontend Agent starts.
 6. **Shared types** — What new interfaces go into `packages/shared`? Define them here.
 7. **Impact on existing code** — Does it touch anything that already works? If yes, document what and why.
 
@@ -37,11 +37,11 @@ apps/api/src/<name>/
     <name>.service.spec.ts
     <name>.routes.spec.ts
 
-apps/web/src/app/(tools)/<name>/
-  page.tsx
-  loading.tsx
-  error.tsx
-  layout.tsx          (optional)
+apps/web/src/pages/<name>/
+  <Name>Page.tsx
+  <Name>Skeleton.tsx
+  <Name>Error.tsx
+  <Name>Layout.tsx     (optional)
 
 apps/web/src/hooks/<name>/
   use<Name>List.ts

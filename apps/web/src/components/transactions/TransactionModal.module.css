@@ -1,0 +1,28 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.panel {
+  background: white;
+  border-radius: var(--radius-modal);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  width: 100%;
+  transition: var(--transition-all);
+}
+
+.heading {
+  font-size: 1.5rem;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text);
+  margin-bottom: var(--space-lg);
+}

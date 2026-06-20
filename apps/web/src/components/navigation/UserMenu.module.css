@@ -1,0 +1,101 @@
+.wrapper {
+  position: relative;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-cta);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.avatar:hover {
+  opacity: 0.9;
+}
+
+.avatarSkeleton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #E5E7EB;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: var(--space-sm);
+  width: 224px;
+  background: white;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid #F3F4F6;
+  z-index: 50;
+}
+
+.userInfo {
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.userEmail {
+  font-size: 0.75rem;
+  color: var(--color-secondary);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #F3F4F6;
+  margin: var(--space-sm) 0;
+}
+
+.signOutButton {
+  font-size: 0.875rem;
+  color: #DC2626;
+  width: 100%;
+  text-align: left;
+  padding: 8px var(--space-md);
+  border-radius: var(--radius-lg);
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.signOutButton:hover {
+  background-color: #FFF1F2;
+}
+
+.signOutArea {
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

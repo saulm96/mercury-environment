@@ -1,48 +1,62 @@
 ---
 name: frontend-page
-description: Next.js page conventions — Server Components by default, mandatory loading.tsx and error.tsx, kebab-case routes
+description: React page conventions — Function Components with Suspense and ErrorBoundary, React Router paths, kebab-case routes
 metadata:
   agent: frontend
 ---
 # frontend-page
 
 **Agent:** Frontend Agent
-**When to activate:** Whenever a new route is created in Next.js.
+**When to activate:** Whenever a new page is created in the frontend.
 
 ---
 
-## Mandatory structure per route
+## Mandatory structure per page
 
 Before creating any page, read `design-system/mercury/MASTER.md` and check if `design-system/mercury/pages/<page>.md` exists. Apply color tokens, typography, spacing, and effects defined there.
 
-Every route has these files. None may be omitted:
+Every page consists of:
 
 ```
-src/app/(tools)/<tool>/
-  page.tsx        ← page component (Server Component by default)
-  loading.tsx     ← skeleton or spinner while loading
-  error.tsx       ← error UI with retry button
-  layout.tsx      ← only if it needs its own layout, otherwise omit
+src/pages/<tool>/
+  <Name>Page.tsx      ← page component (Function Component)
+  <Name>Skeleton.tsx  ← skeleton for Suspense fallback
+  <Name>Error.tsx     ← error UI for ErrorBoundary fallback
+  <Name>Layout.tsx    ← optional custom layout for this page
 ```
 
-## `page.tsx` rules
+Also register the route in `src/routes.tsx` (centralized React Router config).
 
-- Is a **Server Component** by default. Only converted to a Client Component (`'use client'`) if it needs direct interactivity (rare).
-- Contains no business logic. Only composes components and passes data as props.
-- If it needs server data, uses `async/await` directly (Server Component).
-- If it needs client data, delegates to a child component with the corresponding hook.
+## `<Name>Page.tsx` rules
+
+- Is a **Function Component**. No Server Components exist in Vite.
+- Contains no business logic. Only composes container components.
+- Wraps data-fetching containers in `<Suspense>` with the skeleton as fallback.
+- Wraps the content in an `<ErrorBoundary>` (from `react-error-boundary`) with the error UI as fallback.
 
 ```typescript
-// ✅ Correct — Server Component that composes
-export default async function ExpensesPage() {
+// ✅ Correct — composes containers with Suspense + ErrorBoundary
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ExpensesList } from './containers/ExpensesList';
+import { ExpensesSkeleton } from './ExpensesSkeleton';
+import { ExpensesError } from './ExpensesError';
+
+export default function ExpensesPage() {
   return (
     <main>
       <PageHeader title="Expenses" />
-      <ExpensesList />   {/* this component has its own hook */}
+      <ErrorBoundary fallback={<ExpensesError />}>
+        <Suspense fallback={<ExpensesSkeleton />}>
+          <ExpensesList />
+        </Suspense>
+      </ErrorBoundary>
     </main>
   );
 }
+```
 
+```typescript
 // ❌ Forbidden — logic in the page
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
@@ -51,13 +65,13 @@ export default function ExpensesPage() {
 }
 ```
 
-## `loading.tsx` rules
+## `<Name>Skeleton.tsx` rules
 
-Returns a skeleton that replicates the shape of the real page. Do not use generic spinners.
+Returns a skeleton that replicates the shape of the real data. Do not use generic spinners.
 
 ```typescript
 // ✅ Correct
-export default function ExpensesLoading() {
+export function ExpensesSkeleton() {
   return (
     <div>
       <div className="h-8 w-48 bg-gray-200 animate-pulse rounded mb-4" />
@@ -69,31 +83,54 @@ export default function ExpensesLoading() {
 }
 ```
 
-## `error.tsx` rules
+## `<Name>Error.tsx` rules
 
-Always a Client Component (Next.js requirement). Shows the error and offers a retry.
+Shows the error and offers a retry. Uses `FallbackProps` from `react-error-boundary`.
 
 ```typescript
-'use client';
-export default function ExpensesError({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+import type { FallbackProps } from 'react-error-boundary';
+
+export function ExpensesError({ error, resetErrorBoundary }: FallbackProps) {
   return (
-    <div>
-      <p>Something went wrong loading your expenses.</p>
-      <button onClick={reset}>Try again</button>
+    <div className="text-center py-12">
+      <p className="text-red-600 mb-4">Something went wrong loading your expenses.</p>
+      <button onClick={resetErrorBoundary} className="btn-primary">
+        Try again
+      </button>
     </div>
   );
 }
 ```
 
+## `<Name>Layout.tsx` rules (optional)
+
+Only create if the page needs a specific layout different from the global layout. Receives `children` as props and wraps them with shared UI elements (sidebar, tool-specific header, etc.).
+
+## Route registration
+
+Every new page is registered in `src/routes.tsx`:
+
+```typescript
+// src/routes.tsx
+import { createBrowserRouter } from 'react-router-dom';
+import { ExpensesPage } from './pages/expenses/ExpensesPage';
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <AppLayout />,
+    children: [
+      { index: true, element: <LandingPage /> },
+      { path: 'transactions', element: <TransactionsPage /> },
+      { path: 'expenses', element: <ExpensesPage /> },
+    ],
+  },
+]);
+```
+
 ## Route naming
 
-- Tool routes under the `(tools)` group: `src/app/(tools)/expenses/`.
-- Auth routes under the `(auth)` group: `src/app/(auth)/login/`.
-- Never mix groups.
-- Route segments in kebab-case: `income-entries`, not `incomeEntries`.
+- Route paths use kebab-case: `/income-entries`, not `/incomeEntries`.
+- React Router paths are string-based, not file-system based.
+- Tool pages live under a shared layout route with simple path segments.
+- Auth routes (e.g., `/login`) use their own layout if they differ from the main layout.

@@ -1,9 +1,8 @@
-'use client';
-
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
 import type { User, ApiResponse } from '@mercury/shared';
+import styles from './AuthGuard.module.css';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -12,7 +11,7 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const [isValid, setIsValid] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
@@ -22,8 +21,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
         await api.get<ApiResponse<User>>('/users/me');
         if (!cancelled) setIsValid(true);
       } catch {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        router.push('/');
+        try {
+          await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch {
+          // ignore fetch errors during logout
+        }
+        navigate('/');
       } finally {
         if (!cancelled) setIsChecking(false);
       }
@@ -34,12 +37,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [navigate]);
 
   if (isChecking) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-gray-200 border-t-mercury-cta rounded-full animate-spin" />
+      <div className={styles.spinner}>
+        <div className={styles.spinnerCircle} />
       </div>
     );
   }

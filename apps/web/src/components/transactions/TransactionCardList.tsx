@@ -1,6 +1,7 @@
 import type { Transaction } from '@mercury/shared';
 import { TransactionCard } from './TransactionCard';
 import { EmptyState } from './EmptyState';
+import styles from './TransactionCardList.module.css';
 
 interface TransactionCardListProps {
   transactions: Transaction[];
@@ -12,18 +13,18 @@ interface TransactionCardListProps {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-card bg-mercury-background p-6 shadow-mercury-md">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
-          <div className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
+    <div className={styles.skeletonCard}>
+      <div className={styles.skeletonHeader}>
+        <div className={styles.skeletonIconGroup}>
+          <div className={styles.skeletonAvatar} />
+          <div className={styles.skeletonDate} />
         </div>
-        <div className="w-7 h-7 bg-gray-200 animate-pulse rounded-lg" />
+        <div className={styles.skeletonIcon} />
       </div>
-      <div className="h-5 w-3/4 bg-gray-200 animate-pulse rounded mb-2" />
-      <div className="flex items-center justify-between">
-        <div className="h-5 w-16 bg-gray-200 animate-pulse rounded-full" />
-        <div className="h-6 w-20 bg-gray-200 animate-pulse rounded" />
+      <div className={styles.skeletonDescription} />
+      <div className={styles.skeletonFooter}>
+        <div className={styles.skeletonBadge} />
+        <div className={styles.skeletonAmount} />
       </div>
     </div>
   );
@@ -38,7 +39,7 @@ export function TransactionCardList({
 }: TransactionCardListProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className={styles.grid}>
         {Array.from({ length: 6 }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -48,9 +49,9 @@ export function TransactionCardList({
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-rose-600 mb-2">{error}</p>
-        <p className="text-mercury-secondary text-sm">Please try refreshing the page.</p>
+      <div className={styles.error}>
+        <p className={styles.errorText}>{error}</p>
+        <p className={styles.errorSubtext}>Please try refreshing the page.</p>
       </div>
     );
   }
@@ -60,7 +61,7 @@ export function TransactionCardList({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className={styles.grid}>
       {transactions.map((tx) => (
         <TransactionCard key={tx.id} transaction={tx} onEdit={onEdit} />
       ))}

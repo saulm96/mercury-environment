@@ -1,0 +1,29 @@
+.main {
+  padding: var(--space-xl);
+}
+
+.title {
+  height: 32px;
+  width: 192px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  margin-bottom: var(--space-md);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.row {
+  height: 64px;
+  background-color: #F3F4F6;
+  border-radius: 4px;
+  margin-bottom: var(--space-sm);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

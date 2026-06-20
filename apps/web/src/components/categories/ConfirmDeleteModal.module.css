@@ -1,0 +1,91 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.panel {
+  background: white;
+  border-radius: var(--radius-modal);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 440px;
+  width: 100%;
+  transition: var(--transition-all);
+}
+
+.heading {
+  font-size: 1.25rem;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+.message {
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+  line-height: 1.625;
+  margin-bottom: var(--space-xl);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.cancelButton:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteButton {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  background-color: #DC2626;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.deleteButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

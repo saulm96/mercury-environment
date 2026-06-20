@@ -13,7 +13,7 @@ export function UserMenu({ user, loading }: UserMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = useCallback(async () => {
-    await fetch('/auth/logout', { credentials: 'include' });
+    await fetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/';
   }, []);
 

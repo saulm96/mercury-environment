@@ -1,4 +1,5 @@
 import type { Transaction } from '@mercury/shared';
+import { ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -34,38 +35,14 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
             className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600"
             aria-label="Income"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="19" x2="12" y2="5" />
-              <polyline points="5 12 12 5 19 12" />
-            </svg>
+            <ArrowUpIcon />
           </span>
         ) : (
           <span
             className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600"
             aria-label="Expense"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <polyline points="19 12 12 19 5 12" />
-            </svg>
+            <ArrowDownIcon />
           </span>
         )}
         <span className="text-sm text-mercury-secondary">{formatDate(transaction.date)}</span>

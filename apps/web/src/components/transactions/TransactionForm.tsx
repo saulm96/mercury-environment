@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import type { Category } from '@mercury/shared';
 import { CategorySelect } from '@/components/categories/CategorySelect';
+import { SpinnerIcon } from '@/components/icons';
 
 export interface TransactionFormData {
   type: 'income' | 'expense';
@@ -244,28 +245,7 @@ export function TransactionForm({
           disabled={isSubmitting}
           className="flex-1 py-2.5 px-4 rounded-lg bg-mercury-cta text-white font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:-translate-y-px disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
         >
-          {isSubmitting && (
-            <svg
-              className="animate-spin w-4 h-4"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-          )}
+          {isSubmitting && <SpinnerIcon />}
           {initialValues?.description ? 'Save Changes' : 'Create Transaction'}
         </button>
       </div>

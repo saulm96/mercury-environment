@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from 'react';
 import type { Category } from '@mercury/shared';
+import { PlusIcon } from '@/components/icons';
 
 interface CategorySelectProps {
   categories: Category[];
@@ -236,19 +237,7 @@ export function CategorySelect({
                     : 'hover:bg-blue-50'
                 } ${isCreating ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-4 h-4 text-mercury-cta flex-shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                <PlusIcon className="w-4 h-4 text-mercury-cta flex-shrink-0" />
                 <span className="text-mercury-cta font-medium">
                   {isCreating ? 'Creating...' : `Create "${query.trim()}"`}
                 </span>

@@ -12,13 +12,12 @@ RUN npm ci
 
 COPY tsconfig.base.json ./
 COPY apps/web/tsconfig.json apps/web/
-COPY apps/web/next.config.js apps/web/
-COPY apps/web/postcss.config.mjs apps/web/
-COPY apps/web/tailwind.config.ts apps/web/
+COPY apps/web/vite.config.ts apps/web/
+COPY apps/web/index.html apps/web/
 COPY packages/shared/tsconfig.json packages/shared/
 COPY packages/shared/src/ packages/shared/src/
 
-CMD ["sh", "-c", "cd apps/web && npx next dev -H 0.0.0.0 -p 3000"]
+CMD ["sh", "-c", "cd apps/web && npx vite --host --port 3000"]
 
 FROM base AS build
 WORKDIR /app
@@ -35,14 +34,10 @@ COPY apps/web/ ./
 COPY packages/shared/tsconfig.json packages/shared/
 COPY packages/shared/src/ packages/shared/src/
 
-RUN cd apps/web && npx next build
+RUN cd apps/web && npx tsc && npx vite build
 
-FROM base AS production
-WORKDIR /app
-
-COPY --from=build /app/apps/web/.next/standalone/ /app/
-COPY --from=build /app/apps/web/.next/static/ /app/.next/static/
-COPY --from=build /app/apps/web/public/ /app/public/
-
-ENV NODE_ENV=production
-CMD ["node", "server.js"]
+FROM nginx:alpine AS production
+COPY --from=build /app/apps/web/dist/ /usr/share/nginx/html/
+COPY docker/web/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

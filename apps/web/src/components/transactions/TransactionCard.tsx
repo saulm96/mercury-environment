@@ -1,4 +1,6 @@
 import type { Transaction } from '@mercury/shared';
+import { ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
+import styles from './TransactionCard.module.css';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -24,67 +26,46 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
   const isIncome = transaction.type === 'income';
 
   return (
-    <div
-      className="rounded-card bg-mercury-background p-6 shadow-mercury-md transition-all duration-200 hover:shadow-mercury-lg hover:-translate-y-0.5 cursor-pointer"
-      onClick={() => onEdit(transaction)}
-    >
-      <div className="flex items-center gap-2 mb-3">
+    <div className={styles.card} onClick={() => onEdit(transaction)}>
+      <div className={styles.header}>
         {isIncome ? (
-          <span
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600"
-            aria-label="Income"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="19" x2="12" y2="5" />
-              <polyline points="5 12 12 5 19 12" />
-            </svg>
+          <span className={styles.iconIncome} aria-label="Income">
+            <ArrowUpIcon />
           </span>
         ) : (
-          <span
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600"
-            aria-label="Expense"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <polyline points="19 12 12 19 5 12" />
-            </svg>
+          <span className={styles.iconExpense} aria-label="Expense">
+            <ArrowDownIcon />
           </span>
         )}
-        <span className="text-sm text-mercury-secondary">{formatDate(transaction.date)}</span>
+        <span className={styles.date}>{formatDate(transaction.date)}</span>
       </div>
 
-      {/* Description */}
-      <p className="text-mercury-text font-medium mb-2">{transaction.description}</p>
+      <p className={styles.description}>{transaction.description}</p>
 
-      {/* Bottom row: category badge + amount */}
-      <div className="flex items-center justify-between">
+      <div className={styles.footer}>
         {transaction.category ? (
-          <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-mercury-secondary">
-            {transaction.category}
+          <span
+            className={styles.categoryBadge}
+            style={{
+              backgroundColor: transaction.category.color
+                ? `${transaction.category.color}18`
+                : '#F3F4F6',
+              color: transaction.category.color ?? '#6B7280',
+            }}
+          >
+            {transaction.category.color && (
+              <span
+                className={styles.categoryDot}
+                style={{ backgroundColor: transaction.category.color }}
+              />
+            )}
+            {transaction.category.name}
           </span>
         ) : (
-          <span />
+          <span className={styles.uncategorized}>Uncategorized</span>
         )}
         <span
-          className={`text-lg font-semibold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}
+          className={`${styles.amount} ${isIncome ? styles.amountPositive : styles.amountNegative}`}
         >
           {isIncome ? '+' : '-'}
           {formatCurrency(transaction.amount)}

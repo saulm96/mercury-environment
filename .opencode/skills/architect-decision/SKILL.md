@@ -47,5 +47,5 @@ What changes? What technical debt does it introduce? What does it enable in the 
 ## When an ADR is NOT required
 
 - Adding a new Express route following the established pattern.
-- Adding a new page in Next.js following the established pattern.
+- Adding a new page in React following the established pattern.
 - Style, naming, or comment changes.

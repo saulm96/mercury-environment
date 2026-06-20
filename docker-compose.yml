@@ -52,10 +52,11 @@ services:
     ports:
       - '3000:3000'
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+      VITE_API_URL: http://localhost:3001
     volumes:
       - ./apps/web/src:/app/apps/web/src:ro
-      - ./apps/web/public:/app/apps/web/public:ro
+      - ./apps/web/index.html:/app/apps/web/index.html:ro
+      - ./apps/web/vite.config.ts:/app/apps/web/vite.config.ts:ro
       - ./packages/shared/src:/app/packages/shared/src:ro
     depends_on:
       - api

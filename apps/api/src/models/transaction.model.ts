@@ -1,5 +1,6 @@
 import { Column, DataType, Model, Table, ForeignKey, BelongsTo, Index } from 'sequelize-typescript';
 import User from './user.model';
+import Category from './category.model';
 
 @Table({ tableName: 'transactions', timestamps: true, paranoid: true })
 export default class Transaction extends Model {
@@ -14,6 +15,14 @@ export default class Transaction extends Model {
   @BelongsTo(() => User)
   user!: User;
 
+  @ForeignKey(() => Category)
+  @Index({ name: 'idx_transactions_category_id' })
+  @Column({ type: DataType.CHAR(36), allowNull: true })
+  categoryId!: string | null;
+
+  @BelongsTo(() => Category)
+  category!: Category | null;
+
   @Column({ type: DataType.ENUM('income', 'expense'), allowNull: false })
   type!: 'income' | 'expense';
 
@@ -26,7 +35,4 @@ export default class Transaction extends Model {
   @Index({ name: 'idx_transactions_date' })
   @Column({ type: DataType.DATEONLY, allowNull: false })
   date!: string;
-
-  @Column({ type: DataType.STRING(100), allowNull: true })
-  category!: string | null;
 }

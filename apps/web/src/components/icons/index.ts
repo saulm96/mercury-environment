@@ -1,0 +1,9 @@
+export { PlusIcon } from './PlusIcon';
+export { TrashIcon } from './TrashIcon';
+export { CloseIcon } from './CloseIcon';
+export { HamburgerIcon } from './HamburgerIcon';
+export { SpinnerIcon } from './SpinnerIcon';
+export { ArrowUpIcon } from './ArrowUpIcon';
+export { ArrowDownIcon } from './ArrowDownIcon';
+export { EmptyDocIcon } from './EmptyDocIcon';
+export { BulletListIcon } from './BulletListIcon';

@@ -1,0 +1,272 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 64px;
+  background: white;
+  border-bottom: 1px solid #F3F4F6;
+  box-shadow: var(--shadow-sm);
+}
+
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  height: 100%;
+}
+
+@media (min-width: 1024px) {
+  .navInner {
+    padding: 0 var(--space-xl);
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.brand {
+  font-family: 'Caveat', cursive;
+  font-size: 1.5rem;
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.desktopLinks {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopLinks {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+}
+
+.navLink {
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-decoration: none;
+  color: var(--color-secondary);
+  transition: color 0.15s;
+}
+
+.navLink:hover {
+  color: var(--color-text);
+}
+
+.navLinkActive {
+  color: var(--color-cta);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-cta);
+  padding-bottom: 4px;
+}
+
+.desktopUserMenu {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopUserMenu {
+    display: block;
+  }
+}
+
+.hamburgerButton {
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.hamburgerButton:hover {
+  background-color: #F3F4F6;
+}
+
+@media (min-width: 768px) {
+  .hamburgerButton {
+    display: none;
+  }
+}
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+}
+
+@media (min-width: 768px) {
+  .mobileOverlay {
+    display: none;
+  }
+}
+
+.mobileBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.mobilePanel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 288px;
+  height: 100%;
+  background: white;
+  box-shadow: var(--shadow-xl);
+  border-right: 1px solid #F3F4F6;
+  overflow-y: auto;
+}
+
+.mobilePanelInner {
+  padding: var(--space-lg);
+}
+
+.mobileBrand {
+  font-family: 'Caveat', cursive;
+  font-size: 1.5rem;
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
+
+.mobileNavLink {
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: background-color 0.15s, color 0.15s;
+  color: var(--color-secondary);
+}
+
+.mobileNavLink:hover {
+  color: var(--color-text);
+  background-color: #F9FAFB;
+}
+
+.mobileNavLinkActive {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--color-cta);
+  font-weight: 600;
+}
+
+.mobileDivider {
+  border: none;
+  border-top: 1px solid #F3F4F6;
+  margin: var(--space-lg) 0;
+}
+
+.mobileUserSkeleton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobileUserSkeletonAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #E5E7EB;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.mobileUserSkeletonName {
+  height: 12px;
+  width: 96px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.mobileUserSkeletonEmail {
+  height: 10px;
+  width: 128px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  margin-top: 6px;
+}
+
+.mobileUserInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--space-md);
+}
+
+.mobileUserAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-cta);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mobileUserDetails {
+  min-width: 0;
+}
+
+.mobileUserName {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileUserEmail {
+  font-size: 0.75rem;
+  color: var(--color-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileSignOut {
+  font-size: 0.875rem;
+  color: #DC2626;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.mobileSignOut:hover {
+  background-color: #FFF1F2;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

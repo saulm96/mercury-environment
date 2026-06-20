@@ -1,12 +1,13 @@
-'use client';
-
-import type { Transaction } from '@mercury/shared';
+import type { Transaction, Category } from '@mercury/shared';
 import { TransactionForm } from './TransactionForm';
 import type { TransactionFormData } from './TransactionForm';
+import styles from './TransactionModal.module.css';
 
 interface TransactionModalProps {
   isOpen: boolean;
   transaction?: Transaction;
+  categories: Category[];
+  onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   onClose: () => void;
   onSubmit: (data: TransactionFormData) => Promise<void>;
 }
@@ -14,6 +15,8 @@ interface TransactionModalProps {
 export function TransactionModal({
   isOpen,
   transaction,
+  categories,
+  onCreateCategory,
   onClose,
   onSubmit,
 }: TransactionModalProps) {
@@ -21,17 +24,17 @@ export function TransactionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className={styles.overlay}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={transaction ? 'Edit Transaction' : 'New Transaction'}
     >
       <div
-        className="bg-white rounded-modal p-8 shadow-mercury-xl max-w-[500px] w-full transition-all duration-200"
+        className={styles.panel}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-heading text-mercury-text mb-6">
+        <h2 className={styles.heading}>
           {transaction ? 'Edit Transaction' : 'New Transaction'}
         </h2>
         <TransactionForm
@@ -42,10 +45,12 @@ export function TransactionModal({
                   amount: transaction.amount,
                   description: transaction.description,
                   date: transaction.date,
-                  category: transaction.category ?? '',
+                  categoryId: transaction.categoryId ?? undefined,
                 }
               : undefined
           }
+          categories={categories}
+          onCreateCategory={onCreateCategory}
           onSubmit={onSubmit}
           onCancel={onClose}
         />

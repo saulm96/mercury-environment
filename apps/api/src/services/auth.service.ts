@@ -1,5 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model';
+import Category from '../models/category.model';
+import { sequelize } from '../config/database';
+import { SEED_CATEGORIES } from '../config/seed-categories';
 
 export class AuthService {
   async findOrCreateGoogleUser(profile: {
@@ -8,7 +11,7 @@ export class AuthService {
     displayName: string;
   }): Promise<User> {
     const email = profile.emails?.[0]?.value;
-    const [user] = await User.findOrCreate({
+    const [user, created] = await User.findOrCreate({
       where: { email },
       defaults: {
         email,
@@ -17,6 +20,16 @@ export class AuthService {
         providerId: profile.id,
       },
     });
+
+    if (created) {
+      await sequelize.transaction(async (t) => {
+        await Category.bulkCreate(
+          SEED_CATEGORIES.map((c) => ({ ...c, userId: user.id })),
+          { transaction: t },
+        );
+      });
+    }
+
     return user;
   }
 

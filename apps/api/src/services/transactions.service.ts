@@ -1,25 +1,27 @@
 import Transaction from '../models/transaction.model';
+import Category from '../models/category.model';
 import { NotFoundError } from '../middleware/error.middleware';
 
 export class TransactionsService {
   async findAll(userId: string): Promise<Transaction[]> {
-    return Transaction.findAll({ where: { userId } });
+    return Transaction.findAll({ where: { userId }, include: [Category] });
   }
 
   async findById(id: string, userId: string): Promise<Transaction> {
-    const transaction = await Transaction.findOne({ where: { id, userId } });
+    const transaction = await Transaction.findOne({ where: { id, userId }, include: [Category] });
     if (!transaction) throw new NotFoundError(`Transaction ${id} not found`);
     return transaction;
   }
 
   async create(userId: string, data: Partial<Transaction>): Promise<Transaction> {
-    return Transaction.create({ ...data, userId });
+    const transaction = await Transaction.create({ ...data, userId });
+    return transaction.reload({ include: [Category] });
   }
 
   async update(id: string, userId: string, data: Partial<Transaction>): Promise<Transaction> {
     const transaction = await this.findById(id, userId);
     await transaction.update(data);
-    return transaction;
+    return transaction.reload({ include: [Category] });
   }
 
   async delete(id: string, userId: string): Promise<void> {

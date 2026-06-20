@@ -1,17 +1,22 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import type { Category } from '@mercury/shared';
+import { CategorySelect } from '@/components/categories/CategorySelect';
+import { SpinnerIcon } from '@/components/icons';
 
 export interface TransactionFormData {
   type: 'income' | 'expense';
   amount: number;
   description: string;
   date: string;
-  category?: string;
+  categoryId?: string;
 }
 
 interface TransactionFormProps {
   initialValues?: Partial<TransactionFormData>;
+  categories: Category[];
+  onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   onSubmit: (data: TransactionFormData) => Promise<void>;
   onCancel: () => void;
 }
@@ -22,7 +27,13 @@ interface FormErrors {
   date?: string;
 }
 
-export function TransactionForm({ initialValues, onSubmit, onCancel }: TransactionFormProps) {
+export function TransactionForm({
+  initialValues,
+  categories,
+  onCreateCategory,
+  onSubmit,
+  onCancel,
+}: TransactionFormProps) {
   const [type, setType] = useState<'income' | 'expense'>(
     initialValues?.type ?? 'expense',
   );
@@ -31,7 +42,9 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
   const [date, setDate] = useState(
     initialValues?.date?.split('T')[0] ?? new Date().toISOString().split('T')[0],
   );
-  const [category, setCategory] = useState(initialValues?.category ?? '');
+  const [categoryId, setCategoryId] = useState<string | null>(
+    initialValues?.categoryId ?? null,
+  );
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -66,7 +79,7 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
         amount: Number(amount),
         description: description.trim(),
         date,
-        category: category.trim() || undefined,
+        categoryId: categoryId ?? undefined,
       });
     } catch (err) {
       setSubmitError(
@@ -200,13 +213,13 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
           Category{' '}
           <span className="text-mercury-secondary font-normal">(optional)</span>
         </label>
-        <input
-          id="category"
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="e.g., Food, Utilities"
-          className="w-full px-3 py-3 border border-gray-200 rounded-lg text-mercury-text text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-mercury-primary/10 focus:border-mercury-primary"
+        <CategorySelect
+          categories={categories}
+          type={type}
+          value={categoryId}
+          onChange={setCategoryId}
+          onCreateCategory={onCreateCategory}
+          disabled={isSubmitting}
         />
       </div>
 
@@ -232,28 +245,7 @@ export function TransactionForm({ initialValues, onSubmit, onCancel }: Transacti
           disabled={isSubmitting}
           className="flex-1 py-2.5 px-4 rounded-lg bg-mercury-cta text-white font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:-translate-y-px disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
         >
-          {isSubmitting && (
-            <svg
-              className="animate-spin w-4 h-4"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-          )}
+          {isSubmitting && <SpinnerIcon />}
           {initialValues?.description ? 'Save Changes' : 'Create Transaction'}
         </button>
       </div>

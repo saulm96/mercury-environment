@@ -1,4 +1,5 @@
 import type { Transaction } from '@mercury/shared';
+import { ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -34,38 +35,14 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
             className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600"
             aria-label="Income"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="19" x2="12" y2="5" />
-              <polyline points="5 12 12 5 19 12" />
-            </svg>
+            <ArrowUpIcon />
           </span>
         ) : (
           <span
             className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600"
             aria-label="Expense"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <polyline points="19 12 12 19 5 12" />
-            </svg>
+            <ArrowDownIcon />
           </span>
         )}
         <span className="text-sm text-mercury-secondary">{formatDate(transaction.date)}</span>
@@ -77,11 +54,27 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
       {/* Bottom row: category badge + amount */}
       <div className="flex items-center justify-between">
         {transaction.category ? (
-          <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-mercury-secondary">
-            {transaction.category}
+          <span
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full"
+            style={{
+              backgroundColor: transaction.category.color
+                ? `${transaction.category.color}18`
+                : '#F3F4F6',
+              color: transaction.category.color ?? '#6B7280',
+            }}
+          >
+            {transaction.category.color && (
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: transaction.category.color }}
+              />
+            )}
+            {transaction.category.name}
           </span>
         ) : (
-          <span />
+          <span className="inline-block px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-mercury-secondary/60">
+            Uncategorized
+          </span>
         )}
         <span
           className={`text-lg font-semibold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}

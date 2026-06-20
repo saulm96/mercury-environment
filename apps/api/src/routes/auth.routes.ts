@@ -30,4 +30,15 @@ router.get(
   }
 );
 
+router.get('/logout', (req: Request, res: Response) => {
+  const cookieDomain = process.env.COOKIE_DOMAIN ?? 'localhost';
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    domain: cookieDomain,
+  });
+  res.json({ success: true, data: null });
+});
+
 export default router;

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTransactions } from '@/hooks/useTransactions';
 import { TransactionCardList } from '@/components/transactions/TransactionCardList';
 import { TransactionModal } from '@/components/transactions/TransactionModal';
@@ -13,7 +13,6 @@ export default function TransactionsPage() {
     error,
     modal,
     categories,
-    fetchTransactions,
     handleCreate,
     handleUpdate,
     handleCreateCategory,
@@ -34,10 +33,6 @@ export default function TransactionsPage() {
     }
     return counts;
   }, [transactions]);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
 
   return (
     <main className={styles.main}>
@@ -94,7 +89,7 @@ export default function TransactionsPage() {
                 className={styles.closeButton}
                 aria-label="Close"
               >
-                <CloseIcon className="w-5 h-5 text-mercury-secondary" />
+                <CloseIcon />
               </button>
             </div>
             <CategoryManager

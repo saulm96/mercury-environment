@@ -12,6 +12,7 @@ import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
 import transactionsRoutes from './routes/transactions.routes';
 import categoriesRoutes from './routes/categories.routes';
+import budgetsRoutes from './routes/budgets.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const authService = new AuthService();
@@ -67,6 +68,7 @@ export function createApp() {
   app.use('/api/v1/users', usersRoutes);
   app.use('/api/v1/transactions', transactionsRoutes);
   app.use('/api/v1/categories', categoriesRoutes);
+  app.use('/api/v1/budgets', budgetsRoutes);
 
   app.use(errorHandler);
 

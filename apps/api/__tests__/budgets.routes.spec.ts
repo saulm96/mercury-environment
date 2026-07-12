@@ -44,7 +44,6 @@ function mockBudgetData(overrides: Record<string, unknown> = {}) {
     id: 'budget-1',
     userId: 'user-1',
     name: 'Essentials',
-    type: 'percentage',
     value: 50,
     period: 'monthly',
     categories: [{ id: 'cat-1', name: 'Food', color: '#FF6B6B', type: 'expense', isFallback: false, userId: 'user-1' }],
@@ -67,20 +66,19 @@ function mockStatsData() {
     totalAllocated: 3500,
     estimatedSavings: 1500,
     actualSavings: 2500,
-    budgets: [
-      {
-        id: 'budget-1',
-        name: 'Essentials',
-        type: 'percentage',
-        value: 50,
-        allocated: 2500,
-        spent: 2000,
-        remaining: 500,
-        progress: 80,
-        status: 'warning',
-        categories: [],
-      },
-    ],
+      budgets: [
+        {
+          id: 'budget-1',
+          name: 'Essentials',
+          value: 50,
+          allocated: 2500,
+          spent: 2000,
+          remaining: 500,
+          progress: 80,
+          status: 'warning',
+          categories: [],
+        },
+      ],
   };
 }
 
@@ -134,28 +132,12 @@ describe('Budget Routes', () => {
       expect(Array.isArray(res.body.details)).toBe(true);
     });
 
-    it('returns 400 for invalid type', async () => {
-      const app = createApp();
-      const res = await request(app)
-        .post('/api/v1/budgets')
-        .send({
-          name: 'Test',
-          type: 'invalid',
-          value: 50,
-          categoryIds: ['123e4567-e89b-12d3-a456-426614174000'],
-        });
-
-      expect(res.status).toBe(400);
-      expect(res.body.success).toBe(false);
-    });
-
     it('returns 400 for empty categoryIds', async () => {
       const app = createApp();
       const res = await request(app)
         .post('/api/v1/budgets')
         .send({
           name: 'Test',
-          type: 'percentage',
           value: 50,
           categoryIds: [],
         });
@@ -165,7 +147,7 @@ describe('Budget Routes', () => {
     });
 
     it('creates budget with valid body', async () => {
-      const created = mockBudget({ name: 'Test Budget', type: 'fixed', value: 1000 });
+      const created = mockBudget({ name: 'Test Budget', value: 1000 });
       mockService.create.mockResolvedValue(created);
 
       const app = createApp();
@@ -173,7 +155,6 @@ describe('Budget Routes', () => {
         .post('/api/v1/budgets')
         .send({
           name: 'Test Budget',
-          type: 'fixed',
           value: 1000,
           categoryIds: ['123e4567-e89b-12d3-a456-426614174000'],
         });
@@ -181,13 +162,12 @@ describe('Budget Routes', () => {
       expect(res.status).toBe(201);
       expect(res.body).toEqual({
         success: true,
-        data: mockBudgetData({ name: 'Test Budget', type: 'fixed', value: 1000 }),
+        data: mockBudgetData({ name: 'Test Budget', value: 1000 }),
       });
       expect(mockService.create).toHaveBeenCalledWith(
         'user-1',
         expect.objectContaining({
           name: 'Test Budget',
-          type: 'fixed',
           value: 1000,
           categoryIds: ['123e4567-e89b-12d3-a456-426614174000'],
         }),

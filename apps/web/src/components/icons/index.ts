@@ -7,3 +7,6 @@ export { ArrowUpIcon } from './ArrowUpIcon';
 export { ArrowDownIcon } from './ArrowDownIcon';
 export { EmptyDocIcon } from './EmptyDocIcon';
 export { BulletListIcon } from './BulletListIcon';
+export { ArrowLeftIcon } from './ArrowLeftIcon';
+export { ArrowRightIcon } from './ArrowRightIcon';
+export { PencilIcon } from './PencilIcon';

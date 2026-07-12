@@ -4,7 +4,6 @@ export interface Budget {
   id: string;
   userId: string;
   name: string;
-  type: 'percentage' | 'fixed';
   value: number;
   period: 'monthly';
   categories?: Category[];
@@ -25,7 +24,6 @@ export interface BudgetStats {
 export interface BudgetStat {
   id: string;
   name: string;
-  type: 'percentage' | 'fixed';
   value: number;
   allocated: number;
   spent: number;

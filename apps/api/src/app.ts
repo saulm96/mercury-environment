@@ -46,29 +46,38 @@ export function createApp() {
   app.use(cookieParser());
   app.use(passport.initialize());
 
-  const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { success: false, error: 'Too many requests, please try again later.' },
-  });
+  if (env.NODE_ENV === 'production') {
+    const apiLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { success: false, error: 'Too many requests, please try again later.' },
+    });
 
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 20,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { success: false, error: 'Too many auth attempts, please try again later.' },
-  });
+    const authLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 20,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { success: false, error: 'Too many auth attempts, please try again later.' },
+    });
 
-  app.use('/health', healthRoutes);
-  app.use('/auth', authLimiter, authRoutes);
-  app.use('/api/v1', apiLimiter);
-  app.use('/api/v1/users', usersRoutes);
-  app.use('/api/v1/transactions', transactionsRoutes);
-  app.use('/api/v1/categories', categoriesRoutes);
-  app.use('/api/v1/budgets', budgetsRoutes);
+    app.use('/health', healthRoutes);
+    app.use('/auth', authLimiter, authRoutes);
+    app.use('/api/v1', apiLimiter);
+    app.use('/api/v1/users', usersRoutes);
+    app.use('/api/v1/transactions', transactionsRoutes);
+    app.use('/api/v1/categories', categoriesRoutes);
+    app.use('/api/v1/budgets', budgetsRoutes);
+  } else {
+    app.use('/health', healthRoutes);
+    app.use('/auth', authRoutes);
+    app.use('/api/v1/users', usersRoutes);
+    app.use('/api/v1/transactions', transactionsRoutes);
+    app.use('/api/v1/categories', categoriesRoutes);
+    app.use('/api/v1/budgets', budgetsRoutes);
+  }
 
   app.use(errorHandler);
 

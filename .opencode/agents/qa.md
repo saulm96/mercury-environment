@@ -1,6 +1,7 @@
 ---
 description: Quality assurance — verifies API contracts, reviews code, checks test coverage, and validates builds. Read-only, never modifies code.
 mode: subagent
+model: opencode-go/deepseek-v4-pro
 permission:
   edit: deny
   bash: allow

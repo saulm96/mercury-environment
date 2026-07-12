@@ -42,7 +42,6 @@ function mockBudget(overrides: Partial<Budget> = {}): Budget {
     id: 'budget-1',
     userId: 'user-1',
     name: 'Essentials',
-    type: 'percentage' as const,
     value: 50,
     period: 'monthly' as const,
     categories,
@@ -57,7 +56,6 @@ function mockBudget(overrides: Partial<Budget> = {}): Budget {
       id: 'budget-1',
       userId: 'user-1',
       name: 'Essentials',
-      type: 'percentage',
       value: 50,
       period: 'monthly',
       categories: [mockCategory().toJSON()],
@@ -143,7 +141,6 @@ describe('BudgetsService', () => {
 
       const data = {
         name: 'Essentials',
-        type: 'percentage' as const,
         value: 50,
         categoryIds: ['cat-1', 'cat-2'],
       };
@@ -151,11 +148,11 @@ describe('BudgetsService', () => {
       const result = await service.create('user-1', data);
 
       expect(MockedBudget.create).toHaveBeenCalledWith(
-        { name: 'Essentials', type: 'percentage', value: 50, period: undefined, userId: 'user-1' },
+        { name: 'Essentials', value: 50, period: undefined, userId: 'user-1' },
         { transaction: { id: 'tx-1' } },
       );
       expect(MockedCategory.findAll).toHaveBeenCalledWith({
-        where: { id: ['cat-1', 'cat-2'], userId: 'user-1' },
+        where: { id: ['cat-1', 'cat-2'], userId: 'user-1', type: 'expense' },
         transaction: { id: 'tx-1' },
       });
       expect(createdBudget.$add).toHaveBeenCalledWith('categories', cats, { transaction: { id: 'tx-1' } });
@@ -179,12 +176,31 @@ describe('BudgetsService', () => {
 
       const data = {
         name: 'Essentials',
-        type: 'percentage' as const,
         value: 50,
         categoryIds: ['cat-1', 'cat-2'],
       };
 
-      await expect(service.create('user-1', data)).rejects.toThrow(ForbiddenError);
+      await expect(service.create('user-1', data)).rejects.toThrow('Budgets can only include expense categories');
+    });
+
+    it('throws ForbiddenError if categoryIds include non-expense categories', async () => {
+      const createdBudget = mockBudget();
+      (MockedBudget.create as jest.Mock).mockResolvedValue(createdBudget);
+      (MockedCategory.findAll as jest.Mock).mockResolvedValue([]);
+
+      (sequelize.transaction as jest.Mock).mockImplementation(
+        async (fn: (t: unknown) => Promise<Budget>) => {
+          return fn({ id: 'tx-1' });
+        },
+      );
+
+      const data = {
+        name: 'Essentials',
+        value: 50,
+        categoryIds: ['cat-1'],
+      };
+
+      await expect(service.create('user-1', data)).rejects.toThrow('Budgets can only include expense categories');
     });
   });
 
@@ -250,7 +266,7 @@ describe('BudgetsService', () => {
 
       await expect(
         service.update('budget-1', 'user-1', { categoryIds: ['cat-1', 'cat-2'] }),
-      ).rejects.toThrow(ForbiddenError);
+      ).rejects.toThrow('Budgets can only include expense categories');
     });
   });
 
@@ -293,15 +309,13 @@ describe('BudgetsService', () => {
       const budget1 = mockBudget({
         id: 'budget-1',
         name: 'Essentials',
-        type: 'percentage',
-        value: 50,
+        value: 2500,
         categories: [cat1, cat2] as any,
       });
 
       const budget2 = mockBudget({
         id: 'budget-2',
         name: 'Rent',
-        type: 'fixed',
         value: 1000,
         categories: [cat2] as any,
       });

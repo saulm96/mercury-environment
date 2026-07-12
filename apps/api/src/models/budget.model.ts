@@ -29,9 +29,6 @@ export default class Budget extends Model {
   @Column({ type: DataType.STRING(100), allowNull: false })
   name!: string;
 
-  @Column({ type: DataType.ENUM('percentage', 'fixed'), allowNull: false })
-  type!: 'percentage' | 'fixed';
-
   @Column({ type: DataType.DECIMAL(10, 2), allowNull: false })
   value!: number;
 

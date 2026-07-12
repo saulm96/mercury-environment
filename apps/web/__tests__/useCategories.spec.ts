@@ -1,5 +1,5 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { useCategories } from '../src/hooks/useCategories';
+import { useCategories, resetCategoriesCache } from '../src/hooks/useCategories';
 import { api } from '../src/lib/api';
 import type { Category } from '@mercury/shared';
 
@@ -42,6 +42,7 @@ const mockCategories = [
 describe('useCategories', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetCategoriesCache();
   });
 
   it('fetches and returns categories on mount', async () => {

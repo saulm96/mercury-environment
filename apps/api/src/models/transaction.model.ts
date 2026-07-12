@@ -1,8 +1,20 @@
 import { Column, DataType, Model, Table, ForeignKey, BelongsTo, Index } from 'sequelize-typescript';
 import User from './user.model';
 import Category from './category.model';
+import RecurringTransaction from './recurring-transaction.model';
 
-@Table({ tableName: 'transactions', timestamps: true, paranoid: true })
+@Table({
+  tableName: 'transactions',
+  timestamps: true,
+  paranoid: true,
+  indexes: [
+    {
+      name: 'idx_transactions_recurring_date',
+      unique: true,
+      fields: ['recurringTransactionId', 'date'],
+    },
+  ],
+})
 export default class Transaction extends Model {
   @Column({ type: DataType.CHAR(36), defaultValue: DataType.UUIDV4, primaryKey: true })
   id!: string;
@@ -35,4 +47,12 @@ export default class Transaction extends Model {
   @Index({ name: 'idx_transactions_date' })
   @Column({ type: DataType.DATEONLY, allowNull: false })
   date!: string;
+
+  @ForeignKey(() => RecurringTransaction)
+  @Index({ name: 'idx_transactions_recurring_id' })
+  @Column({ type: DataType.CHAR(36), allowNull: true })
+  recurringTransactionId!: string | null;
+
+  @BelongsTo(() => RecurringTransaction)
+  recurringTransaction!: RecurringTransaction | null;
 }

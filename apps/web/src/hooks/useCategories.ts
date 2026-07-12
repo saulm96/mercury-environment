@@ -13,17 +13,35 @@ interface UseCategoriesReturn {
   handleDelete: (id: string) => Promise<void>;
 }
 
+let cachedCategories: Category[] | null = null;
+let categoriesCacheTs = 0;
+const CATEGORIES_CACHE_TTL = 60_000;
+
+export function resetCategoriesCache() {
+  cachedCategories = null;
+  categoriesCacheTs = 0;
+}
+
 export function useCategories(): UseCategoriesReturn {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchCategories = useCallback(async () => {
+    const now = Date.now();
+    if (cachedCategories !== null && now - categoriesCacheTs < CATEGORIES_CACHE_TTL) {
+      setCategories(cachedCategories);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const response = await api.get<ApiResponse<Category[]>>('/categories');
-      setCategories(response.data ?? []);
+      const data = response.data ?? [];
+      cachedCategories = data;
+      categoriesCacheTs = Date.now();
+      setCategories(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -36,6 +54,7 @@ export function useCategories(): UseCategoriesReturn {
       setError(null);
       try {
         const response = await api.post<ApiResponse<Category>>('/categories', { name, type, color });
+        cachedCategories = null;
         await fetchCategories();
         return response.data!;
       } catch (err) {
@@ -52,6 +71,7 @@ export function useCategories(): UseCategoriesReturn {
       setError(null);
       try {
         await api.patch<ApiResponse<Category>>(`/categories/${id}`, data);
+        cachedCategories = null;
         await fetchCategories();
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
@@ -67,6 +87,7 @@ export function useCategories(): UseCategoriesReturn {
       setError(null);
       try {
         await api.delete<ApiResponse<null>>(`/categories/${id}`);
+        cachedCategories = null;
         await fetchCategories();
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';

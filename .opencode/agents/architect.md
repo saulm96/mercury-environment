@@ -1,6 +1,7 @@
 ---
 description: Technical architect — designs tools, documents decisions (ADRs), coordinates backend and frontend. Does not write implementation code.
 mode: subagent
+model: opencode-go/glm-5.2
 permission:
   edit: allow
   bash: deny

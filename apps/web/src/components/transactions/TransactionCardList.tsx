@@ -8,6 +8,7 @@ interface TransactionCardListProps {
   loading: boolean;
   error: string | null;
   onEdit: (tx: Transaction) => void;
+  onEditSeries?: (tx: Transaction) => void;
   onCreateClick: () => void;
 }
 
@@ -35,6 +36,7 @@ export function TransactionCardList({
   loading,
   error,
   onEdit,
+  onEditSeries,
   onCreateClick,
 }: TransactionCardListProps) {
   if (loading) {
@@ -63,7 +65,7 @@ export function TransactionCardList({
   return (
     <div className={styles.grid}>
       {transactions.map((tx) => (
-        <TransactionCard key={tx.id} transaction={tx} onEdit={onEdit} />
+        <TransactionCard key={tx.id} transaction={tx} onEdit={onEdit} onEditSeries={onEditSeries} />
       ))}
     </div>
   );

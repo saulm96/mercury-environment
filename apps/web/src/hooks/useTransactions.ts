@@ -35,7 +35,7 @@ interface UseTransactionsReturn {
   closeModal: () => void;
 }
 
-export function useTransactions(): UseTransactionsReturn {
+export function useTransactions(enabled: boolean = true): UseTransactionsReturn {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,8 +113,9 @@ export function useTransactions(): UseTransactionsReturn {
   );
 
   useEffect(() => {
+    if (!enabled) return;
     fetchTransactions();
-  }, [fetchTransactions]);
+  }, [fetchTransactions, enabled]);
 
   return {
     transactions,

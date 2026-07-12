@@ -1,6 +1,7 @@
 ---
 description: Frontend developer — implements React pages, components, hooks, and API client integration with tests
 mode: subagent
+model: opencode-go/kimi-k2.7-code
 permission:
   edit: allow
   bash: allow

@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import TransactionsPage from '../src/pages/tools/transactions/TransactionsPage';
 import type { Transaction, Category } from '@mercury/shared';
 
@@ -87,6 +88,10 @@ jest.mock('../src/hooks/useTransactions', () => ({
   useTransactions: () => mockUseTransactions,
 }));
 
+jest.mock('../src/components/transactions/RecurringSyncProvider', () => ({
+  useRecurringSync: () => ({ ready: true, error: null }),
+}));
+
 // ---------------------------------------------------------------------------
 // Helper to reset the shared mock object to defaults
 // ---------------------------------------------------------------------------
@@ -101,6 +106,14 @@ function resetMock() {
   jest.clearAllMocks();
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <TransactionsPage />
+    </MemoryRouter>,
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -112,7 +125,7 @@ describe('TransactionsPage', () => {
   // 1. Renders the "Transactions" heading and "New Transaction" button
   // -------------------------------------------------------------------------
   it('renders the "Transactions" heading and "New Transaction" button', () => {
-    render(<TransactionsPage />);
+    renderPage();
 
     expect(
       screen.getByRole('heading', { name: 'Transactions' }),
@@ -126,7 +139,7 @@ describe('TransactionsPage', () => {
   // 2. Renders "Manage Categories" button (BulletListIcon)
   // -------------------------------------------------------------------------
   it('renders "Manage Categories" button with BulletListIcon', () => {
-    render(<TransactionsPage />);
+    renderPage();
 
     const categoryButton = screen.getByRole('button', {
       name: 'Manage Categories',
@@ -143,7 +156,7 @@ describe('TransactionsPage', () => {
   it('passes loading state to TransactionCardList', () => {
     mockUseTransactions.loading = true;
 
-    render(<TransactionsPage />);
+    renderPage();
 
     // When loading, 6 skeleton cards should be rendered inside the grid
     // (each skeleton card is a div inside the grid div)
@@ -164,7 +177,7 @@ describe('TransactionsPage', () => {
   it('passes error state to TransactionCardList', () => {
     mockUseTransactions.error = 'Network failure';
 
-    render(<TransactionsPage />);
+    renderPage();
 
     expect(screen.getByText('Network failure')).toBeInTheDocument();
     expect(
@@ -178,7 +191,7 @@ describe('TransactionsPage', () => {
   it('passes transactions data to TransactionCardList', () => {
     mockUseTransactions.transactions = [mockTransaction, mockTransaction2];
 
-    render(<TransactionsPage />);
+    renderPage();
 
     // Transaction descriptions should appear in TransactionCard
     expect(screen.getByText('Groceries')).toBeInTheDocument();
@@ -189,7 +202,7 @@ describe('TransactionsPage', () => {
   // 6. Clicking "New Transaction" calls openCreateModal from the hook
   // -------------------------------------------------------------------------
   it('clicking "New Transaction" calls openCreateModal from the hook', () => {
-    render(<TransactionsPage />);
+    renderPage();
 
     fireEvent.click(screen.getByRole('button', { name: 'New Transaction' }));
 
@@ -202,7 +215,7 @@ describe('TransactionsPage', () => {
   it('clicking a transaction card calls openEditModal with the transaction', () => {
     mockUseTransactions.transactions = [mockTransaction];
 
-    render(<TransactionsPage />);
+    renderPage();
 
     // TransactionCard wraps the whole card in an onClick that calls onEdit.
     // Since CSS modules are mocked to {}, the card div has no class attribute.
@@ -219,7 +232,7 @@ describe('TransactionsPage', () => {
   // 8. Clicking "Manage Categories" opens the CategoryManager modal
   // -------------------------------------------------------------------------
   it('clicking "Manage Categories" opens the CategoryManager modal', () => {
-    render(<TransactionsPage />);
+    renderPage();
 
     // Modal should NOT be visible initially
     expect(
@@ -240,7 +253,7 @@ describe('TransactionsPage', () => {
   // 9. Clicking overlay on CategoryManager modal closes it
   // -------------------------------------------------------------------------
   it('clicking the modal overlay closes the CategoryManager modal', () => {
-    render(<TransactionsPage />);
+    renderPage();
 
     // Open the modal
     fireEvent.click(
@@ -262,7 +275,7 @@ describe('TransactionsPage', () => {
   // 9b. Clicking close button on CategoryManager modal closes it
   // -------------------------------------------------------------------------
   it('clicking the close button closes the CategoryManager modal', () => {
-    render(<TransactionsPage />);
+    renderPage();
 
     // Open the modal
     fireEvent.click(
@@ -287,7 +300,7 @@ describe('TransactionsPage', () => {
   it('CategoryManager modal receives categories and callbacks from the hook', () => {
     mockUseTransactions.categories = mockCategories;
 
-    render(<TransactionsPage />);
+    renderPage();
 
     // Open the CategoryManager modal
     fireEvent.click(
@@ -311,7 +324,7 @@ describe('TransactionsPage', () => {
     mockUseTransactions.modal = { open: true };
     mockUseTransactions.categories = mockCategories;
 
-    render(<TransactionsPage />);
+    renderPage();
 
     // The TransactionModal renders a dialog when open
     const dialog = screen.getByRole('dialog');
@@ -329,7 +342,7 @@ describe('TransactionsPage', () => {
     mockUseTransactions.modal = { open: true };
     mockUseTransactions.categories = mockCategories;
 
-    render(<TransactionsPage />);
+    renderPage();
 
     // Fill in required fields in the TransactionModal
     fireEvent.change(screen.getByLabelText('Amount'), {

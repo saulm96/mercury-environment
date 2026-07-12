@@ -1,0 +1,335 @@
+.main {
+  padding: var(--space-xl);
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.heading {
+  font-size: 1.875rem;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text);
+}
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background-color: var(--color-cta);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-all);
+  font-family: 'Quicksand', sans-serif;
+}
+
+.createButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.errorBanner {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-card);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.errorText {
+  font-size: 0.875rem;
+  color: #DC2626;
+  font-weight: 500;
+}
+
+.retryButton {
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: var(--color-cta);
+  color: white;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: var(--transition-all);
+  white-space: nowrap;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.retryButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.skeletonCard {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #F3F4F6;
+}
+
+.skeletonTop {
+  height: 16px;
+  width: 40%;
+  background: #E5E7EB;
+  border-radius: 4px;
+  margin-bottom: var(--space-md);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonBottom {
+  height: 12px;
+  width: 70%;
+  background: #E5E7EB;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.emptyState {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #F3F4F6;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.emptyText {
+  font-size: 1rem;
+  color: var(--color-secondary);
+  max-width: 420px;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #F3F4F6;
+  transition: var(--transition-all);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.cardMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.cardName {
+  font-size: 1.25rem;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text);
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+}
+
+.valueBadge {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.iconButton {
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  border: none;
+  background: none;
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: var(--transition-all);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconButton:hover {
+  background-color: #F3F4F6;
+  color: var(--color-text);
+}
+
+.deleteIconButton:hover {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  background: #F3F4F6;
+  font-size: 0.8125rem;
+  color: var(--color-text);
+}
+
+.chipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.chipName {
+  font-weight: 500;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modalPanel {
+  background: white;
+  border-radius: var(--radius-modal);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 420px;
+  width: 100%;
+  transition: var(--transition-all);
+}
+
+.modalHeading {
+  font-size: 1.5rem;
+  font-family: 'Caveat', cursive;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.modalText {
+  font-size: 1rem;
+  color: var(--color-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+}
+
+.cancelButton {
+  padding: 10px 20px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-all);
+  font-family: 'Quicksand', sans-serif;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px 20px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background-color: #DC2626;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-all);
+  font-family: 'Quicksand', sans-serif;
+}
+
+.deleteButton:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.deleteButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

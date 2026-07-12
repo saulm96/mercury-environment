@@ -12,4 +12,7 @@ export const sequelize = new Sequelize({
   password: env.DB_PASSWORD,
   models: [path.join(__dirname, '..', 'models')],
   logging: env.NODE_ENV === 'development' ? (sql: string) => logger.debug(sql) : false,
+  dialectOptions: {
+    decimalNumbers: true,
+  },
 });

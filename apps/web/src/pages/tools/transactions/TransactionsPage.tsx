@@ -1,12 +1,17 @@
 import { useState, useMemo } from 'react';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useRecurringSync } from '@/components/transactions/RecurringSyncProvider';
 import { TransactionCardList } from '@/components/transactions/TransactionCardList';
 import { TransactionModal } from '@/components/transactions/TransactionModal';
 import { CategoryManager } from '@/components/categories/CategoryManager';
+import { useNavigate } from 'react-router-dom';
 import { BulletListIcon, CloseIcon } from '@/components/icons';
+import TransactionsSkeleton from './TransactionsSkeleton';
 import styles from './TransactionsPage.module.css';
 
 export default function TransactionsPage() {
+  const { ready } = useRecurringSync();
+  const navigate = useNavigate();
   const {
     transactions,
     loading,
@@ -20,7 +25,7 @@ export default function TransactionsPage() {
     openCreateModal,
     openEditModal,
     closeModal,
-  } = useTransactions();
+  } = useTransactions(ready);
 
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
@@ -33,6 +38,16 @@ export default function TransactionsPage() {
     }
     return counts;
   }, [transactions]);
+
+  function handleEditSeries(tx: { recurringTransactionId: string | null }) {
+    if (tx.recurringTransactionId) {
+      navigate('/economy/recurring');
+    }
+  }
+
+  if (!ready) {
+    return <TransactionsSkeleton />;
+  }
 
   return (
     <main className={styles.main}>
@@ -57,6 +72,7 @@ export default function TransactionsPage() {
         loading={loading}
         error={error}
         onEdit={openEditModal}
+        onEditSeries={handleEditSeries}
         onCreateClick={openCreateModal}
       />
 

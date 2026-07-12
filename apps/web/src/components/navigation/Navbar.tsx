@@ -33,15 +33,15 @@ export function Navbar() {
     <nav className={styles.nav}>
       <div className={styles.navInner}>
         <div className={styles.left}>
-          <Link to="/transactions" className={styles.brand}>
+          <Link to="/economy/dashboard" className={styles.brand}>
             Mercury
           </Link>
           <div className={styles.desktopLinks}>
             <Link
-              to="/transactions"
-              className={`${styles.navLink} ${isActive('/transactions') ? styles.navLinkActive : ''}`}
+              to="/economy/dashboard"
+              className={`${styles.navLink} ${isActive('/economy') ? styles.navLinkActive : ''}`}
             >
-              Transactions
+              Economy
             </Link>
           </div>
         </div>
@@ -65,7 +65,7 @@ export function Navbar() {
           <div ref={mobileMenuRef} className={styles.mobilePanel}>
             <div className={styles.mobilePanelInner}>
               <Link
-                to="/transactions"
+                to="/economy/dashboard"
                 className={styles.mobileBrand}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -74,10 +74,10 @@ export function Navbar() {
 
               <nav className={styles.mobileNav}>
                 <Link
-                  to="/transactions"
-                  className={`${styles.mobileNavLink} ${isActive('/transactions') ? styles.mobileNavLinkActive : ''}`}
+                  to="/economy/dashboard"
+                  className={`${styles.mobileNavLink} ${isActive('/economy') ? styles.mobileNavLinkActive : ''}`}
                 >
-                  Transactions
+                  Economy
                 </Link>
               </nav>
 

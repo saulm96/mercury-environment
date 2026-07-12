@@ -1,11 +1,13 @@
 import { CategoriesService } from '../src/services/categories.service';
 import Category from '../src/models/category.model';
 import Transaction from '../src/models/transaction.model';
+import RecurringTransaction from '../src/models/recurring-transaction.model';
 import { sequelize } from '../src/config/database';
 import { NotFoundError, ForbiddenError } from '../src/middleware/error.middleware';
 
 jest.mock('../src/models/category.model');
 jest.mock('../src/models/transaction.model');
+jest.mock('../src/models/recurring-transaction.model');
 jest.mock('../src/config/database', () => ({
   sequelize: {
     transaction: jest.fn(),
@@ -14,6 +16,7 @@ jest.mock('../src/config/database', () => ({
 
 const MockedCategory = Category as jest.Mocked<typeof Category>;
 const MockedTransaction = Transaction as jest.Mocked<typeof Transaction>;
+const MockedRecurringTransaction = RecurringTransaction as jest.Mocked<typeof RecurringTransaction>;
 const MockedSequelize = sequelize as jest.Mocked<typeof sequelize>;
 
 function mockCategory(overrides: Partial<Category> = {}): Category {
@@ -144,11 +147,16 @@ describe('CategoriesService', () => {
 
       (MockedCategory.findOne as jest.Mock).mockResolvedValueOnce(fallback);
       (MockedTransaction.update as jest.Mock).mockResolvedValue([1]);
+      (MockedRecurringTransaction.update as jest.Mock).mockResolvedValue([1]);
 
       await service.delete('cat-1', 'user-1');
 
       expect(sequelize.transaction).toHaveBeenCalled();
       expect(MockedTransaction.update).toHaveBeenCalledWith(
+        { categoryId: fallback.id },
+        { where: { userId: 'user-1', categoryId: 'cat-1' }, transaction: { id: 'tx-1' } },
+      );
+      expect(MockedRecurringTransaction.update).toHaveBeenCalledWith(
         { categoryId: fallback.id },
         { where: { userId: 'user-1', categoryId: 'cat-1' }, transaction: { id: 'tx-1' } },
       );

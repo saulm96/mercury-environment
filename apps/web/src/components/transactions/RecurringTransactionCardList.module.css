@@ -1,0 +1,121 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.skeletonCard {
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.skeletonHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.skeletonIconGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.skeletonAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #E5E7EB;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonDescription {
+  height: 20px;
+  width: 128px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonIcon {
+  width: 28px;
+  height: 28px;
+  background-color: #E5E7EB;
+  border-radius: var(--radius-lg);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonBody {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.skeletonDetail {
+  height: 32px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skeletonBadge {
+  height: 20px;
+  width: 64px;
+  background-color: #E5E7EB;
+  border-radius: var(--radius-full);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeletonAmount {
+  height: 24px;
+  width: 80px;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.error {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.errorText {
+  color: #DC2626;
+  margin-bottom: var(--space-sm);
+}
+
+.errorSubtext {
+  color: var(--color-secondary);
+  font-size: 0.875rem;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

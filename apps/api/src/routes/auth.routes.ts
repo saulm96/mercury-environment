@@ -22,7 +22,7 @@ router.get(
         domain: env.COOKIE_DOMAIN,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      res.redirect(`${env.FRONTEND_URL}/transactions`);
+      res.redirect(`${env.FRONTEND_URL}/economy/dashboard`);
     } catch (err) {
       next(err);
     }

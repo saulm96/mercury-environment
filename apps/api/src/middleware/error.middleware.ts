@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../config/logger';
 
 export class NotFoundError extends Error {
   constructor(message: string) {
@@ -23,6 +24,6 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     res.status(403).json({ success: false, error: err.message });
     return;
   }
-  console.error(err);
+  logger.error(err);
   res.status(500).json({ success: false, error: 'Internal server error' });
 }

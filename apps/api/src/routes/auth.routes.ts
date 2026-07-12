@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { AuthService } from '../services/auth.service';
+import { env } from '../config/env';
 
 const router = Router();
 const authService = new AuthService();
@@ -14,16 +15,14 @@ router.get(
     try {
       const user = req.user!;
       const token = authService.generateToken(user as any);
-      const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
-      const cookieDomain = process.env.COOKIE_DOMAIN ?? 'localhost';
       res.cookie('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: env.NODE_ENV === 'production',
         sameSite: 'lax',
-        domain: cookieDomain,
+        domain: env.COOKIE_DOMAIN,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      res.redirect(`${frontendUrl}/transactions`);
+      res.redirect(`${env.FRONTEND_URL}/transactions`);
     } catch (err) {
       next(err);
     }
@@ -31,12 +30,11 @@ router.get(
 );
 
 router.post('/logout', (req: Request, res: Response) => {
-  const cookieDomain = process.env.COOKIE_DOMAIN ?? 'localhost';
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'lax',
-    domain: cookieDomain,
+    domain: env.COOKIE_DOMAIN,
   });
   res.json({ success: true, data: null });
 });

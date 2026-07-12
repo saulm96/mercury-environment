@@ -2,7 +2,7 @@ interface IconProps {
   className?: string;
 }
 
-export function EmptyDocIcon({ className = 'w-16 h-16' }: IconProps) {
+export function EmptyDocIcon({ className = 'icon-xl' }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />

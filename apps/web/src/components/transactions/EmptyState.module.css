@@ -9,6 +9,7 @@
 
 .icon {
   margin-bottom: var(--space-md);
+  color: rgba(63, 63, 70, 0.3);
 }
 
 .heading {

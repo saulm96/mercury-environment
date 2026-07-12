@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { env } from '../config/env';
 
 declare global {
   namespace Express {
@@ -19,8 +20,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
   }
 
   try {
-    const secret = process.env.JWT_SECRET ?? 'dev-secret';
-    const decoded = jwt.verify(token, secret) as Express.User;
+    const decoded = jwt.verify(token, env.JWT_SECRET) as Express.User;
     req.user = decoded;
     next();
   } catch {

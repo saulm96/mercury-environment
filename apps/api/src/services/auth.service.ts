@@ -3,6 +3,7 @@ import User from '../models/user.model';
 import Category from '../models/category.model';
 import { sequelize } from '../config/database';
 import { SEED_CATEGORIES } from '../config/seed-categories';
+import { env } from '../config/env';
 
 export class AuthService {
   async findOrCreateGoogleUser(profile: {
@@ -34,12 +35,10 @@ export class AuthService {
   }
 
   generateToken(user: User): string {
-    const secret = process.env.JWT_SECRET ?? 'dev-secret';
-    const expiresIn = process.env.JWT_EXPIRES_IN ?? '7d';
     return jwt.sign(
       { id: user.id, email: user.email },
-      secret,
-      { expiresIn } as jwt.SignOptions
+      env.JWT_SECRET,
+      { expiresIn: env.JWT_EXPIRES_IN } as jwt.SignOptions
     );
   }
 }

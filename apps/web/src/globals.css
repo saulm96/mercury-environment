@@ -59,6 +59,19 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
+/* Icon sizing */
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+.icon-lg { width: 24px; height: 24px; }
+.icon-xl { width: 64px; height: 64px; }
+
+@keyframes icon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.icon-spin { animation: icon-spin 1s linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

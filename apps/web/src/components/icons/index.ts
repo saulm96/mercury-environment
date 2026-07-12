@@ -10,3 +10,4 @@ export { BulletListIcon } from './BulletListIcon';
 export { ArrowLeftIcon } from './ArrowLeftIcon';
 export { ArrowRightIcon } from './ArrowRightIcon';
 export { PencilIcon } from './PencilIcon';
+export { RepeatIcon } from './RepeatIcon';

@@ -1,14 +1,14 @@
-import type { Transaction } from '@mercury/shared';
-import { TransactionCard } from './TransactionCard';
+import type { RecurringTransaction } from '@mercury/shared';
+import { RecurringTransactionCard } from './RecurringTransactionCard';
 import { EmptyState } from './EmptyState';
-import styles from './TransactionCardList.module.css';
+import styles from './RecurringTransactionCardList.module.css';
 
-interface TransactionCardListProps {
-  transactions: Transaction[];
+interface RecurringTransactionCardListProps {
+  recurringTransactions: RecurringTransaction[];
   loading: boolean;
   error: string | null;
-  onEdit: (tx: Transaction) => void;
-  onEditSeries?: (tx: Transaction) => void;
+  onEdit: (rt: RecurringTransaction) => void;
+  onDelete: (rt: RecurringTransaction) => void;
   onCreateClick: () => void;
 }
 
@@ -18,11 +18,14 @@ function SkeletonCard() {
       <div className={styles.skeletonHeader}>
         <div className={styles.skeletonIconGroup}>
           <div className={styles.skeletonAvatar} />
-          <div className={styles.skeletonDate} />
+          <div className={styles.skeletonDescription} />
         </div>
         <div className={styles.skeletonIcon} />
       </div>
-      <div className={styles.skeletonDescription} />
+      <div className={styles.skeletonBody}>
+        <div className={styles.skeletonDetail} />
+        <div className={styles.skeletonDetail} />
+      </div>
       <div className={styles.skeletonFooter}>
         <div className={styles.skeletonBadge} />
         <div className={styles.skeletonAmount} />
@@ -31,14 +34,14 @@ function SkeletonCard() {
   );
 }
 
-export function TransactionCardList({
-  transactions,
+export function RecurringTransactionCardList({
+  recurringTransactions,
   loading,
   error,
   onEdit,
-  onEditSeries,
+  onDelete,
   onCreateClick,
-}: TransactionCardListProps) {
+}: RecurringTransactionCardListProps) {
   if (loading) {
     return (
       <div className={styles.grid}>
@@ -58,14 +61,19 @@ export function TransactionCardList({
     );
   }
 
-  if (transactions.length === 0) {
+  if (recurringTransactions.length === 0) {
     return <EmptyState onCreateClick={onCreateClick} />;
   }
 
   return (
     <div className={styles.grid}>
-      {transactions.map((tx) => (
-        <TransactionCard key={tx.id} transaction={tx} onEdit={onEdit} onEditSeries={onEditSeries} />
+      {recurringTransactions.map((rt) => (
+        <RecurringTransactionCard
+          key={rt.id}
+          recurringTransaction={rt}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );

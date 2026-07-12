@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useBudgets } from '@/hooks/useBudgets';
+import { useRecurringSync } from '@/components/transactions/RecurringSyncProvider';
 import { MonthlySummary } from '@/components/dashboard/MonthlySummary';
 import { BudgetProgress } from '@/components/dashboard/BudgetProgress';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/icons';
+import DashboardSkeleton from './DashboardSkeleton';
 import styles from './DashboardPage.module.css';
 
 function getMonthLabel(year: number, month: number): string {
@@ -16,6 +18,7 @@ export default function DashboardPage() {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
 
+  const { ready } = useRecurringSync();
   const { stats, loading, error, fetchStats } = useBudgets();
 
   const loadStats = useCallback(() => {
@@ -23,8 +26,9 @@ export default function DashboardPage() {
   }, [fetchStats, year, month]);
 
   useEffect(() => {
+    if (!ready) return;
     loadStats();
-  }, [loadStats]);
+  }, [loadStats, ready]);
 
   const handlePrevMonth = () => {
     if (month === 0) {
@@ -56,6 +60,10 @@ export default function DashboardPage() {
     : null;
 
   const budgetStats = stats?.budgets ?? [];
+
+  if (!ready) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <main className={styles.main}>

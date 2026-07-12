@@ -9,6 +9,7 @@ export interface Transaction {
   date: string;
   categoryId: string | null;
   category?: Category | null;
+  recurringTransactionId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

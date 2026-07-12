@@ -1,5 +1,6 @@
 import Category from '../models/category.model';
 import Transaction from '../models/transaction.model';
+import RecurringTransaction from '../models/recurring-transaction.model';
 import { NotFoundError, ForbiddenError } from '../middleware/error.middleware';
 import { sequelize } from '../config/database';
 import { Transaction as SeqTransaction } from 'sequelize';
@@ -47,6 +48,11 @@ export class CategoriesService {
       if (!fallback) throw new NotFoundError(`Fallback category for type ${category.type} not found`);
 
       await Transaction.update(
+        { categoryId: fallback.id },
+        { where: { userId, categoryId: id }, transaction: t },
+      );
+
+      await RecurringTransaction.update(
         { categoryId: fallback.id },
         { where: { userId, categoryId: id }, transaction: t },
       );

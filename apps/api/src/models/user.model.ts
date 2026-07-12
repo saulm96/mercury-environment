@@ -1,5 +1,6 @@
 import { Column, DataType, Model, Table, HasMany } from 'sequelize-typescript';
 import Transaction from './transaction.model';
+import RecurringTransaction from './recurring-transaction.model';
 
 @Table({ tableName: 'users', timestamps: true, paranoid: true })
 export default class User extends Model {
@@ -20,4 +21,7 @@ export default class User extends Model {
 
   @HasMany(() => Transaction)
   transactions!: Transaction[];
+
+  @HasMany(() => RecurringTransaction)
+  recurringTransactions!: RecurringTransaction[];
 }

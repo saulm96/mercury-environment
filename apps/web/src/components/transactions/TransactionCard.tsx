@@ -1,10 +1,11 @@
 import type { Transaction } from '@mercury/shared';
-import { ArrowUpIcon, ArrowDownIcon } from '@/components/icons';
+import { ArrowUpIcon, ArrowDownIcon, RepeatIcon } from '@/components/icons';
 import styles from './TransactionCard.module.css';
 
 interface TransactionCardProps {
   transaction: Transaction;
   onEdit: (tx: Transaction) => void;
+  onEditSeries?: (tx: Transaction) => void;
 }
 
 function formatCurrency(amount: number): string {
@@ -22,7 +23,7 @@ function formatDate(dateStr: string): string {
   });
 }
 
-export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
+export function TransactionCard({ transaction, onEdit, onEditSeries }: TransactionCardProps) {
   const isIncome = transaction.type === 'income';
 
   return (
@@ -38,6 +39,16 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
           </span>
         )}
         <span className={styles.date}>{formatDate(transaction.date)}</span>
+        {transaction.recurringTransactionId && (
+          <button
+            className={styles.recurringBadge}
+            aria-label="View recurring series"
+            onClick={(e) => { e.stopPropagation(); onEditSeries?.(transaction); }}
+          >
+            <RepeatIcon />
+            <span className={styles.recurringText}>recurring</span>
+          </button>
+        )}
       </div>
 
       <p className={styles.description}>{transaction.description}</p>

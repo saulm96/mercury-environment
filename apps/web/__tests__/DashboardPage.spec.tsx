@@ -78,6 +78,10 @@ jest.mock('../src/hooks/useBudgets', () => ({
   useBudgets: () => mockUseBudgets,
 }));
 
+jest.mock('../src/components/transactions/RecurringSyncProvider', () => ({
+  useRecurringSync: () => ({ ready: true, error: null }),
+}));
+
 function resetMock() {
   mockUseBudgets.budgets = [];
   mockUseBudgets.stats = null;

@@ -13,6 +13,7 @@ import usersRoutes from './routes/users.routes';
 import transactionsRoutes from './routes/transactions.routes';
 import categoriesRoutes from './routes/categories.routes';
 import budgetsRoutes from './routes/budgets.routes';
+import recurringTransactionsRoutes from './routes/recurring-transactions.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const authService = new AuthService();
@@ -70,6 +71,7 @@ export function createApp() {
     app.use('/api/v1/transactions', transactionsRoutes);
     app.use('/api/v1/categories', categoriesRoutes);
     app.use('/api/v1/budgets', budgetsRoutes);
+    app.use('/api/v1/recurring-transactions', recurringTransactionsRoutes);
   } else {
     app.use('/health', healthRoutes);
     app.use('/auth', authRoutes);
@@ -77,6 +79,7 @@ export function createApp() {
     app.use('/api/v1/transactions', transactionsRoutes);
     app.use('/api/v1/categories', categoriesRoutes);
     app.use('/api/v1/budgets', budgetsRoutes);
+    app.use('/api/v1/recurring-transactions', recurringTransactionsRoutes);
   }
 
   app.use(errorHandler);

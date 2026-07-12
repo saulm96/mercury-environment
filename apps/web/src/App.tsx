@@ -7,6 +7,9 @@ import EconomyLayout, { EconomyIndex } from './pages/tools/economy/EconomyLayout
 import TransactionsPage from './pages/tools/transactions/TransactionsPage';
 import TransactionsSkeleton from './pages/tools/transactions/TransactionsSkeleton';
 import TransactionsError from './pages/tools/transactions/TransactionsError';
+import RecurringPage from './pages/tools/recurring/RecurringPage';
+import RecurringSkeleton from './pages/tools/recurring/RecurringSkeleton';
+import RecurringError from './pages/tools/recurring/RecurringError';
 import DashboardPage from './pages/tools/dashboard/DashboardPage';
 import DashboardSkeleton from './pages/tools/dashboard/DashboardSkeleton';
 import DashboardError from './pages/tools/dashboard/DashboardError';
@@ -47,6 +50,16 @@ export default function App() {
               <ErrorBoundary FallbackComponent={TransactionsError}>
                 <Suspense fallback={<TransactionsSkeleton />}>
                   <TransactionsPage />
+                </Suspense>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="recurring"
+            element={
+              <ErrorBoundary FallbackComponent={RecurringError}>
+                <Suspense fallback={<RecurringSkeleton />}>
+                  <RecurringPage />
                 </Suspense>
               </ErrorBoundary>
             }

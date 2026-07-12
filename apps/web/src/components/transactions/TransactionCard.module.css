@@ -46,6 +46,30 @@
   color: var(--color-secondary);
 }
 
+.recurringBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: #E0E7FF;
+  color: #4338CA;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.recurringText {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .recurringText {
+    display: inline;
+  }
+}
+
 .description {
   color: var(--color-text);
   font-weight: 500;

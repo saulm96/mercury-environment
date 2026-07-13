@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useBudgets } from '@/hooks/useBudgets';
+import { useSubscriptions } from '@/hooks/useSubscriptions';
 import { useRecurringSync } from '@/components/transactions/RecurringSyncProvider';
 import { MonthlySummary } from '@/components/dashboard/MonthlySummary';
+import { SubscriptionSummaryWidget } from '@/components/dashboard/SubscriptionSummary';
 import { BudgetProgress } from '@/components/dashboard/BudgetProgress';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/icons';
 import DashboardSkeleton from './DashboardSkeleton';
@@ -20,10 +22,15 @@ export default function DashboardPage() {
 
   const { ready } = useRecurringSync();
   const { stats, loading, error, fetchStats } = useBudgets();
+  const {
+    stats: subscriptionStats,
+    fetchStats: fetchSubscriptionStats,
+  } = useSubscriptions();
 
   const loadStats = useCallback(() => {
     fetchStats(year, month + 1);
-  }, [fetchStats, year, month]);
+    fetchSubscriptionStats(year, month + 1);
+  }, [fetchStats, fetchSubscriptionStats, year, month]);
 
   useEffect(() => {
     if (!ready) return;
@@ -115,6 +122,16 @@ export default function DashboardPage() {
           estimatedSavings={summaryData.estimatedSavings}
           actualSavings={summaryData.actualSavings}
         />
+      )}
+
+      {subscriptionStats && subscriptionStats.activeCount > 0 && (
+        <div className={styles.subscriptionSummarySection}>
+          <SubscriptionSummaryWidget
+            monthlyTotal={subscriptionStats.monthlyTotal}
+            activeCount={subscriptionStats.activeCount}
+            nextRenewal={subscriptionStats.nextRenewal}
+          />
+        </div>
       )}
 
       <section className={styles.budgetsSection}>

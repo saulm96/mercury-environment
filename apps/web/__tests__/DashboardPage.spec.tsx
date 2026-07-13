@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import DashboardPage from '../src/pages/tools/dashboard/DashboardPage';
 import type { BudgetStat, Category, BudgetStats } from '@mercury/shared';
 
@@ -61,6 +62,7 @@ const mockStats: BudgetStats = {
 };
 
 const mockFetchStats = jest.fn().mockResolvedValue(undefined);
+const mockFetchSubscriptionStats = jest.fn().mockResolvedValue(undefined);
 
 const mockUseBudgets = {
   budgets: [] as BudgetStat[],
@@ -78,6 +80,27 @@ jest.mock('../src/hooks/useBudgets', () => ({
   useBudgets: () => mockUseBudgets,
 }));
 
+const mockUseSubscriptions = {
+  subscriptions: [],
+  loading: false,
+  error: null,
+  fetchSubscriptions: jest.fn().mockResolvedValue(undefined),
+  fetchStats: mockFetchSubscriptionStats,
+  fetchServiceTypes: jest.fn().mockResolvedValue(undefined),
+  fetchUpcoming: jest.fn().mockResolvedValue(undefined),
+  handleCreate: jest.fn().mockResolvedValue(undefined),
+  handleUpdate: jest.fn().mockResolvedValue(undefined),
+  handleDelete: jest.fn().mockResolvedValue(undefined),
+  stats: null,
+  serviceTypeStats: [],
+  upcomingRenewals: [],
+  resetCache: jest.fn(),
+};
+
+jest.mock('../src/hooks/useSubscriptions', () => ({
+  useSubscriptions: () => mockUseSubscriptions,
+}));
+
 jest.mock('../src/components/transactions/RecurringSyncProvider', () => ({
   useRecurringSync: () => ({ ready: true, error: null }),
 }));
@@ -87,6 +110,7 @@ function resetMock() {
   mockUseBudgets.stats = null;
   mockUseBudgets.loading = false;
   mockUseBudgets.error = null;
+  mockUseSubscriptions.stats = null;
   jest.clearAllMocks();
 }
 
@@ -179,5 +203,44 @@ describe('DashboardPage', () => {
 
     expect(screen.getByText('Network failure')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+  });
+
+  it('renders SubscriptionSummaryWidget when subscriptions exist', () => {
+    mockUseBudgets.stats = mockStats;
+    mockUseSubscriptions.stats = {
+      monthlyTotal: 92.45,
+      yearlyTotal: 1109.4,
+      activeCount: 4,
+      nextRenewal: { description: 'Netflix', date: '2025-08-15', daysUntil: 5 },
+    };
+
+    render(
+      <MemoryRouter>
+        <DashboardPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Subscriptions')).toBeInTheDocument();
+    expect(screen.getByText('92.45€')).toBeInTheDocument();
+    expect(screen.getByText('4 active')).toBeInTheDocument();
+    expect(screen.getByText(/Netflix/)).toBeInTheDocument();
+  });
+
+  it('does not render SubscriptionSummaryWidget when there are no active subscriptions', () => {
+    mockUseBudgets.stats = mockStats;
+    mockUseSubscriptions.stats = {
+      monthlyTotal: 0,
+      yearlyTotal: 0,
+      activeCount: 0,
+      nextRenewal: null,
+    };
+
+    render(
+      <MemoryRouter>
+        <DashboardPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText('Subscriptions')).not.toBeInTheDocument();
   });
 });

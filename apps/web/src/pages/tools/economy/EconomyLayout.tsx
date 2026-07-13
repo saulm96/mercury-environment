@@ -20,6 +20,9 @@ export default function EconomyLayout() {
         <NavLink to="/economy/recurring" className={isActive}>
           Recurring
         </NavLink>
+        <NavLink to="/economy/subscriptions" className={isActive}>
+          Subscriptions
+        </NavLink>
       </nav>
       <div className={styles.content}>
         <Outlet />

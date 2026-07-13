@@ -1,0 +1,64 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-radius: var(--radius-card);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid #F3F4F6;
+  transition: var(--transition-all);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.topRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+  font-weight: 500;
+}
+
+.nextRenewal {
+  font-size: 0.8125rem;
+  color: var(--color-cta);
+  font-weight: 500;
+}
+
+.arrow {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-cta);
+  white-space: nowrap;
+}

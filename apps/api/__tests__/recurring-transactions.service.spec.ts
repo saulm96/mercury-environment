@@ -3,6 +3,7 @@ import { RecurringTransactionsService } from '../src/services/recurring-transact
 import RecurringTransaction from '../src/models/recurring-transaction.model';
 import RecurringSkip from '../src/models/recurring-skip.model';
 import Transaction from '../src/models/transaction.model';
+import Subscription from '../src/models/subscription.model';
 import Category from '../src/models/category.model';
 import { sequelize } from '../src/config/database';
 import { NotFoundError } from '../src/middleware/error.middleware';
@@ -10,6 +11,7 @@ import { NotFoundError } from '../src/middleware/error.middleware';
 jest.mock('../src/models/recurring-transaction.model');
 jest.mock('../src/models/recurring-skip.model');
 jest.mock('../src/models/transaction.model');
+jest.mock('../src/models/subscription.model');
 jest.mock('../src/models/category.model');
 jest.mock('../src/config/database', () => ({
   sequelize: {
@@ -28,6 +30,7 @@ jest.mock('../src/config/logger', () => ({
 const MockedRecurringTransaction = RecurringTransaction as jest.Mocked<typeof RecurringTransaction>;
 const MockedRecurringSkip = RecurringSkip as jest.Mocked<typeof RecurringSkip>;
 const MockedTransaction = Transaction as jest.Mocked<typeof Transaction>;
+const MockedSubscription = Subscription as jest.Mocked<typeof Subscription>;
 const MockedSequelize = sequelize as jest.Mocked<typeof sequelize>;
 
 function mockRecurring(overrides: Partial<RecurringTransaction> = {}): RecurringTransaction {
@@ -185,13 +188,17 @@ describe('RecurringTransactionsService', () => {
   });
 
   describe('delete', () => {
-    it('soft-deletes the recurring transaction and returns void', async () => {
+    it('soft-deletes the recurring transaction and its linked subscription', async () => {
       const rec = mockRecurring();
       (MockedRecurringTransaction.findOne as jest.Mock).mockResolvedValue(rec);
+      (MockedSubscription.destroy as jest.Mock).mockResolvedValue(0);
 
       const result = await service.delete('rec-1', 'user-1');
 
       expect(rec.destroy).toHaveBeenCalled();
+      expect(MockedSubscription.destroy).toHaveBeenCalledWith({
+        where: { recurringTransactionId: 'rec-1' },
+      });
       expect(result).toBeUndefined();
     });
 

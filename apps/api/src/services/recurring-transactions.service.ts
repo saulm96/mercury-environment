@@ -3,6 +3,7 @@ import RecurringTransaction from '../models/recurring-transaction.model';
 import RecurringSkip from '../models/recurring-skip.model';
 import Transaction from '../models/transaction.model';
 import Category from '../models/category.model';
+import Subscription from '../models/subscription.model';
 import { NotFoundError } from '../middleware/error.middleware';
 import { logger } from '../config/logger';
 import { sequelize } from '../config/database';
@@ -56,6 +57,7 @@ export class RecurringTransactionsService {
   async delete(id: string, userId: string): Promise<void> {
     const recurring = await this.findById(id, userId);
     await recurring.destroy();
+    await Subscription.destroy({ where: { recurringTransactionId: id } });
   }
 
   async skipDate(id: string, userId: string, occurrenceDate: string): Promise<RecurringSkipType> {

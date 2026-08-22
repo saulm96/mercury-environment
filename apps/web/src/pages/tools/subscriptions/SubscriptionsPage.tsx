@@ -294,12 +294,31 @@ export default function SubscriptionsPage() {
       .map((rt) => ({ id: rt.id, description: rt.description }));
   }, [recurringTransactions, subscriptions]);
 
+  const handleCreateAndRefresh = useCallback(
+    async (data: { recurringTransactionId: string; serviceType: string }) => {
+      await handleCreate(data);
+      loadData();
+    },
+    [handleCreate, loadData],
+  );
+
+  const handleUpdateAndRefresh = useCallback(
+    async (data: { serviceType: string }) => {
+      if (!editingSubscription) return;
+      await handleUpdate(editingSubscription.id, data);
+      setEditingSubscription(null);
+      loadData();
+    },
+    [handleUpdate, editingSubscription, loadData],
+  );
+
   async function confirmDelete() {
     if (!deletingSubscription) return;
     setIsDeleting(true);
     try {
       await handleDelete(deletingSubscription.id);
       setDeletingSubscription(null);
+      loadData();
     } finally {
       setIsDeleting(false);
     }
@@ -465,7 +484,7 @@ export default function SubscriptionsPage() {
       {isMarkModalOpen && (
         <MarkSubscriptionModal
           recurringOptions={recurringOptions}
-          onSubmit={handleCreate}
+          onSubmit={handleCreateAndRefresh}
           onCancel={() => setIsMarkModalOpen(false)}
         />
       )}
@@ -473,7 +492,7 @@ export default function SubscriptionsPage() {
       {editingSubscription && (
         <EditServiceTypeModal
           currentServiceType={editingSubscription.serviceType}
-          onSubmit={(data) => handleUpdate(editingSubscription.id, data)}
+          onSubmit={handleUpdateAndRefresh}
           onCancel={() => setEditingSubscription(null)}
         />
       )}

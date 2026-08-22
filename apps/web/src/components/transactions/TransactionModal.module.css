@@ -17,6 +17,8 @@
   box-shadow: var(--shadow-xl);
   max-width: 500px;
   width: 100%;
+  max-height: calc(100vh - 2 * var(--space-md));
+  overflow-y: auto;
   transition: var(--transition-all);
 }
 

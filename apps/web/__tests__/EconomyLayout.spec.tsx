@@ -12,13 +12,12 @@ function renderLayout(initialRoute = '/economy/dashboard') {
 }
 
 describe('EconomyLayout', () => {
-  it('renders the five sub-navigation tabs', () => {
+  it('renders the four sub-navigation tabs', () => {
     renderLayout();
 
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Budgets' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Transactions' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Recurring' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Subscriptions' })).toBeInTheDocument();
   });
 
@@ -43,12 +42,6 @@ describe('EconomyLayout', () => {
     expect(screen.getByRole('link', { name: 'Transactions' })).toHaveAttribute('aria-current', 'page');
   });
 
-  it('marks the Recurring tab as active when on /economy/recurring', () => {
-    renderLayout('/economy/recurring');
-
-    expect(screen.getByRole('link', { name: 'Recurring' })).toHaveAttribute('aria-current', 'page');
-  });
-
   it('marks the Subscriptions tab as active when on /economy/subscriptions', () => {
     renderLayout('/economy/subscriptions');
 
@@ -61,7 +54,6 @@ describe('EconomyLayout', () => {
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/economy/dashboard');
     expect(screen.getByRole('link', { name: 'Budgets' })).toHaveAttribute('href', '/economy/budgets');
     expect(screen.getByRole('link', { name: 'Transactions' })).toHaveAttribute('href', '/economy/transactions');
-    expect(screen.getByRole('link', { name: 'Recurring' })).toHaveAttribute('href', '/economy/recurring');
     expect(screen.getByRole('link', { name: 'Subscriptions' })).toHaveAttribute('href', '/economy/subscriptions');
   });
 

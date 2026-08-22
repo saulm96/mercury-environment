@@ -105,3 +105,30 @@
 .closeButton:hover {
   background-color: #F3F4F6;
 }
+
+.modalHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.deleteButton {
+  padding: 8px 14px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background-color: #DC2626;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.deleteButton:hover {
+  opacity: 0.9;
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

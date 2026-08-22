@@ -367,4 +367,211 @@ describe('TransactionForm', () => {
       expect(onCreateCategory).toHaveBeenCalledWith('Groceries', 'expense', expect.any(String));
     });
   });
+
+  it('shows the Recurring? toggle in create mode but not in edit mode', () => {
+    const { rerender } = render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText('Recurring?')).toBeInTheDocument();
+
+    rerender(
+      <TransactionForm
+        initialValues={{
+          type: 'expense',
+          amount: 50,
+          description: 'Coffee',
+          date: '2025-01-15',
+        }}
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Recurring?')).not.toBeInTheDocument();
+  });
+
+  it('reveals recurring fields when the Recurring? toggle is on', () => {
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByLabelText(/Frequency/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Interval/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/End date/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+
+    expect(screen.getByLabelText(/Frequency/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Interval/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/End date/i)).toBeInTheDocument();
+  });
+
+  it('shows dayOfMonth for monthly frequency and dayOfWeek for weekly frequency', () => {
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+
+    expect(screen.getByLabelText(/Day of month/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Day of week/i)).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/Frequency/i), { target: { value: 'weekly' } });
+
+    expect(screen.queryByLabelText(/Day of month/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Day of week/i)).toBeInTheDocument();
+  });
+
+  it('shows the subscription checkbox only for recurring expenses', () => {
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByLabelText('Mark as subscription')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+    expect(screen.getByLabelText('Mark as subscription')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Income' }));
+    expect(screen.queryByLabelText('Mark as subscription')).not.toBeInTheDocument();
+  });
+
+  it('reveals the service type select when Mark as subscription is checked', () => {
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+    expect(screen.queryByLabelText(/Service type/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('Mark as subscription'));
+    expect(screen.getByLabelText(/Service type/i)).toBeInTheDocument();
+  });
+
+  it('submits recurring fields when Recurring? is checked', async () => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={onSubmit}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText('Amount'), { target: { value: '100' } });
+    fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'Rent' } });
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2025-01-01' } });
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+    fireEvent.change(screen.getByLabelText(/Interval/i), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText(/Day of month/i), { target: { value: '15' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create Recurring' }));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      type: 'expense',
+      amount: 100,
+      description: 'Rent',
+      date: '2025-01-01',
+      categoryId: undefined,
+      isRecurring: true,
+      frequency: 'monthly',
+      interval: 2,
+      dayOfMonth: 15,
+    });
+  });
+
+  it('submits subscription fields when Mark as subscription is checked', async () => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={onSubmit}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText('Amount'), { target: { value: '15' } });
+    fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'Netflix' } });
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2025-01-01' } });
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+    fireEvent.click(screen.getByLabelText('Mark as subscription'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create Recurring' }));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      type: 'expense',
+      amount: 15,
+      description: 'Netflix',
+      date: '2025-01-01',
+      categoryId: undefined,
+      isRecurring: true,
+      frequency: 'monthly',
+      interval: 1,
+      isSubscription: true,
+      serviceType: 'streaming',
+    });
+  });
+
+  it('validates recurring fields when Recurring? is checked', async () => {
+    render(
+      <TransactionForm
+        categories={mockCategories}
+        onCreateCategory={jest.fn()}
+        onSubmit={jest.fn()}
+        onCancel={jest.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText('Amount'), { target: { value: '50' } });
+    fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'Gym' } });
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2025-01-01' } });
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+    fireEvent.change(screen.getByLabelText(/Interval/i), { target: { value: '0' } });
+
+    fireEvent.submit(screen.getByRole('button', { name: 'Create Recurring' }).closest('form')!);
+
+    await waitFor(() => {
+      expect(screen.getByText('Interval must be at least 1.')).toBeInTheDocument();
+    });
+  });
 });

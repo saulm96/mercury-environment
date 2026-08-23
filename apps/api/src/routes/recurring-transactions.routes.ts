@@ -1,6 +1,7 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
+import { asyncHandler } from '../utils/async-handler';
 import {
   createRecurringTransactionSchema,
   updateRecurringTransactionSchema,
@@ -10,14 +11,6 @@ import { RecurringTransactionsService } from '../services/recurring-transactions
 
 const router = Router();
 const recurringTransactionsService = new RecurringTransactionsService();
-
-type AsyncRouteHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
-
-const asyncHandler = (fn: AsyncRouteHandler) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-};
 
 router.get(
   '/',
@@ -51,7 +44,7 @@ router.get(
   '/:id',
   authenticate,
   asyncHandler(async (req: Request, res: Response) => {
-    const recurring = await recurringTransactionsService.findById(req.params.id as string, req.user!.id);
+    const recurring = await recurringTransactionsService.findById(req.params.id, req.user!.id);
     res.json({ success: true, data: recurring.toJSON() });
   }),
 );
@@ -62,7 +55,7 @@ router.patch(
   validate(updateRecurringTransactionSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const recurring = await recurringTransactionsService.update(
-      req.params.id as string,
+      req.params.id,
       req.user!.id,
       req.body,
     );
@@ -74,7 +67,7 @@ router.delete(
   '/:id',
   authenticate,
   asyncHandler(async (req: Request, res: Response) => {
-    await recurringTransactionsService.delete(req.params.id as string, req.user!.id);
+    await recurringTransactionsService.delete(req.params.id, req.user!.id);
     res.json({ success: true, data: null });
   }),
 );
@@ -85,7 +78,7 @@ router.post(
   validate(skipRecurringTransactionSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const skip = await recurringTransactionsService.skipDate(
-      req.params.id as string,
+      req.params.id,
       req.user!.id,
       req.body.occurrenceDate,
     );
@@ -98,7 +91,7 @@ router.delete(
   authenticate,
   asyncHandler(async (req: Request, res: Response) => {
     await recurringTransactionsService.unskipDate(
-      req.params.id as string,
+      req.params.id,
       req.user!.id,
       req.query.occurrenceDate as string,
     );

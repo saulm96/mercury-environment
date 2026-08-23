@@ -2,6 +2,7 @@ import request from 'supertest';
 import { createApp } from '../src/app';
 import { TransactionsService } from '../src/services/transactions.service';
 import { authenticate } from '../src/middleware/auth.middleware';
+import { NotFoundError } from '../src/middleware/error.middleware';
 
 jest.mock('../src/config/logger', () => ({
   logger: {
@@ -108,6 +109,17 @@ describe('Transaction Routes', () => {
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ success: true, data: mockTxData() });
       expect(mockService.findById).toHaveBeenCalledWith('tx-1', 'user-1');
+    });
+
+    it('returns 404 when transaction is not found', async () => {
+      mockService.findById.mockRejectedValue(new NotFoundError('Transaction tx-1 not found'));
+
+      const app = createApp();
+      const res = await request(app).get('/api/v1/transactions/tx-1');
+
+      expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toBe('Transaction tx-1 not found');
     });
   });
 

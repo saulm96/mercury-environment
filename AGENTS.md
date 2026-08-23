@@ -34,6 +34,7 @@ src/middleware/  auth / error / validation       src/config/  database.ts, env.t
 
 Conventions an agent would otherwise guess wrong:
 - Every response is the `ApiResponse<T>` envelope from `@mercury/shared`: `{ success, data }` / `{ success, error }`. Never return unwrapped data.
+- **Every async route handler must be wrapped in `asyncHandler`** (`src/utils/async-handler.ts`). Express 4 does not forward rejected promises to `errorHandler` — unwrapped handlers hang the request and can crash the process on `NotFoundError`/`ForbiddenError`.
 - Auth = **JWT in an HTTP cookie** (`req.cookies.token`), verified by the `authenticate` middleware which sets `req.user = { id, email }`. Extract the user from `req.user`, never `req.params`/`req.query`. Google OAuth registers only when `GOOGLE_CLIENT_ID`/`SECRET` are set.
 - Sequelize models: UUID v4 PK stored as `CHAR(36)`, `paranoid: true` (soft delete), `timestamps: true`, snake_case plural table names, `userId` always indexed. Business errors throw `NotFoundError`/`ForbiddenError` → handled by `error.middleware.ts`.
 - **Schema sync: `sequelize.sync({ alter: true })` runs on API startup in development only** (`src/index.ts`). There are **no migrations yet** — editing a model auto-alters the dev DB on next `npm run dev`. Migrations are deferred to pre-production; do not add them without coordinating.

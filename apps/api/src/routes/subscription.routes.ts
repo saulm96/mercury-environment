@@ -1,6 +1,7 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
+import { asyncHandler } from '../utils/async-handler';
 import {
   createSubscriptionSchema,
   updateSubscriptionSchema,
@@ -9,14 +10,6 @@ import { SubscriptionsService } from '../services/subscription.service';
 
 const router = Router();
 const subscriptionsService = new SubscriptionsService();
-
-type AsyncRouteHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
-
-const asyncHandler = (fn: AsyncRouteHandler) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-};
 
 router.get(
   '/',
@@ -67,7 +60,7 @@ router.get(
   authenticate,
   asyncHandler(async (req: Request, res: Response) => {
     const subscription = await subscriptionsService.findById(
-      req.params.id as string,
+      req.params.id,
       req.user!.id,
     );
     res.json({ success: true, data: subscription.toJSON() });
@@ -90,7 +83,7 @@ router.patch(
   validate(updateSubscriptionSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const subscription = await subscriptionsService.update(
-      req.params.id as string,
+      req.params.id,
       req.user!.id,
       req.body,
     );
@@ -102,7 +95,7 @@ router.delete(
   '/:id',
   authenticate,
   asyncHandler(async (req: Request, res: Response) => {
-    await subscriptionsService.delete(req.params.id as string, req.user!.id);
+    await subscriptionsService.delete(req.params.id, req.user!.id);
     res.json({ success: true, data: null });
   }),
 );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { User } from '@mercury/shared';
+import { signOut } from '@/lib/auth';
 import styles from './UserMenu.module.css';
 
 interface UserMenuProps {
@@ -12,7 +13,7 @@ export function UserMenu({ user, loading }: UserMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = useCallback(async () => {
-    await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+    await signOut();
     window.location.href = '/';
   }, []);
 

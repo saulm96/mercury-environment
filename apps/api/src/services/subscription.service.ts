@@ -82,19 +82,30 @@ export class SubscriptionsService {
     await subscription.destroy();
   }
 
-  async getStats(userId: string, _year: number, _month: number): Promise<SubscriptionSummary> {
+  async getStats(
+    userId: string,
+    year?: number,
+    month?: number,
+  ): Promise<SubscriptionSummary> {
     const subscriptions = await Subscription.findAll({
       where: { userId },
       include: [ACTIVE_RECURRING_INCLUDE],
     });
 
+    const shouldFilter = this.isValidYearMonth(year, month);
+
     let monthlyTotal = 0;
+    let activeCount = 0;
     for (const subscription of subscriptions) {
+      if (shouldFilter && !this.overlapsMonth(subscription, year!, month!)) {
+        continue;
+      }
       monthlyTotal += this.normalizeToMonthly(
         Number(subscription.recurringTransaction.amount),
         subscription.recurringTransaction.frequency,
         subscription.recurringTransaction.interval,
       );
+      activeCount += 1;
     }
 
     const today = new Date();
@@ -104,7 +115,9 @@ export class SubscriptionsService {
     let minDays = Infinity;
 
     for (const subscription of subscriptions) {
-      const nextDate = new Date(`${subscription.recurringTransaction.nextDate}T00:00:00`);
+      const nextDate = new Date(
+        `${subscription.recurringTransaction.nextDate}T00:00:00`,
+      );
       const daysUntil = Math.ceil(
         (nextDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
       );
@@ -121,27 +134,39 @@ export class SubscriptionsService {
     return {
       monthlyTotal: Number(monthlyTotal.toFixed(2)),
       yearlyTotal: Number((monthlyTotal * 12).toFixed(2)),
-      activeCount: subscriptions.length,
+      activeCount,
       nextRenewal,
     };
   }
 
-  async getByServiceType(userId: string): Promise<ServiceTypeStat[]> {
+  async getByServiceType(
+    userId: string,
+    year?: number,
+    month?: number,
+  ): Promise<ServiceTypeStat[]> {
     const subscriptions = await Subscription.findAll({
       where: { userId },
       include: [ACTIVE_RECURRING_INCLUDE],
     });
 
+    const shouldFilter = this.isValidYearMonth(year, month);
     const groups = new Map<string, { monthlyTotal: number; count: number }>();
 
     for (const subscription of subscriptions) {
+      if (shouldFilter && !this.overlapsMonth(subscription, year!, month!)) {
+        continue;
+      }
+
       const monthly = this.normalizeToMonthly(
         Number(subscription.recurringTransaction.amount),
         subscription.recurringTransaction.frequency,
         subscription.recurringTransaction.interval,
       );
 
-      const current = groups.get(subscription.serviceType) || { monthlyTotal: 0, count: 0 };
+      const current = groups.get(subscription.serviceType) || {
+        monthlyTotal: 0,
+        count: 0,
+      };
       current.monthlyTotal += monthly;
       current.count += 1;
       groups.set(subscription.serviceType, current);
@@ -171,6 +196,39 @@ export class SubscriptionsService {
         },
       ],
     });
+  }
+
+  private isValidYearMonth(year?: number, month?: number): boolean {
+    return (
+      year !== undefined &&
+      month !== undefined &&
+      !Number.isNaN(year) &&
+      !Number.isNaN(month)
+    );
+  }
+
+  private getMonthBoundaries(year: number, month: number) {
+    const firstDay = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDayDate = new Date(year, month, 0);
+    const lastDay = `${lastDayDate.getFullYear()}-${String(
+      lastDayDate.getMonth() + 1,
+    ).padStart(2, '0')}-${String(lastDayDate.getDate()).padStart(2, '0')}`;
+    return { firstDay, lastDay };
+  }
+
+  private overlapsMonth(
+    subscription: Subscription,
+    year: number,
+    month: number,
+  ): boolean {
+    const recurring = subscription.recurringTransaction;
+    const { firstDay, lastDay } = this.getMonthBoundaries(year, month);
+
+    const startsBeforeOrInMonth = recurring.startDate <= lastDay;
+    const endsAfterOrInMonth =
+      !recurring.endDate || recurring.endDate >= firstDay;
+
+    return startsBeforeOrInMonth && endsAfterOrInMonth;
   }
 
   private normalizeToMonthly(amount: number, frequency: string, interval: number): number {

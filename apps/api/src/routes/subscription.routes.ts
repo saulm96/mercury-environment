@@ -35,7 +35,13 @@ router.get(
   '/service-types',
   authenticate,
   asyncHandler(async (req: Request, res: Response) => {
-    const stats = await subscriptionsService.getByServiceType(req.user!.id);
+    const year = parseInt(req.query.year as string, 10);
+    const month = parseInt(req.query.month as string, 10);
+    const stats = await subscriptionsService.getByServiceType(
+      req.user!.id,
+      year,
+      month,
+    );
     res.json({ success: true, data: stats });
   }),
 );

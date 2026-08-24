@@ -568,6 +568,24 @@ describe('TransactionsPage', () => {
   });
 
   // -------------------------------------------------------------------------
+  // 18a. Clicking "Edit series instead" in the occurrence modal opens the series-edit modal
+  // -------------------------------------------------------------------------
+  it('clicking "Edit series instead" closes the occurrence modal and opens the series-edit modal', () => {
+    mockUseTransactions.modal = { open: true, transaction: mockRecurringTransaction };
+    mockUseTransactions.categories = mockCategories;
+    mockUseRecurringTransactions.recurringTransactions = [mockRecurringTemplate];
+
+    renderPage();
+
+    expect(screen.getByRole('dialog', { name: 'Edit Transaction' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit series instead' }));
+
+    expect(mockCloseModal).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('dialog', { name: 'Edit Recurring Series' })).toBeInTheDocument();
+  });
+
+  // -------------------------------------------------------------------------
   // 18. Deleting from the series-edit modal calls handleDeleteRecurring and refreshes
   // -------------------------------------------------------------------------
   it('deleting from the series-edit modal deletes the recurring series and refreshes transactions', async () => {

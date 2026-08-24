@@ -1,7 +1,8 @@
-const API_BASE = process.env.VITE_API_URL ?? '';
+export const API_ORIGIN = process.env.VITE_API_URL ?? '';
+const API_BASE = `${API_ORIGIN}/api/v1`;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}/api/v1${path}`, {
+  const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     credentials: 'include',
     headers: {

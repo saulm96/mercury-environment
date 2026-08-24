@@ -195,6 +195,8 @@ describe('SubscriptionsService', () => {
             amount: 12,
             frequency: 'monthly',
             interval: 1,
+            startDate: '2024-01-01',
+            endDate: null,
             nextDate: '2099-01-10',
             description: 'Netflix',
           }),
@@ -207,6 +209,8 @@ describe('SubscriptionsService', () => {
             amount: 120,
             frequency: 'yearly',
             interval: 1,
+            startDate: '2024-01-01',
+            endDate: null,
             nextDate: '2099-01-20',
             description: 'ChatGPT',
           }),
@@ -222,6 +226,123 @@ describe('SubscriptionsService', () => {
       expect(result.nextRenewal).toEqual({
         description: 'Netflix',
         date: '2099-01-10',
+        daysUntil: expect.any(Number),
+      });
+    });
+
+    it('excludes subscriptions starting after the target month', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2024-02-01',
+            endDate: null,
+            nextDate: '2099-02-15',
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const result = await service.getStats('user-1', 2024, 1);
+
+      expect(result.monthlyTotal).toBe(0);
+      expect(result.yearlyTotal).toBe(0);
+      expect(result.activeCount).toBe(0);
+    });
+
+    it('excludes subscriptions with endDate before the target month', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2023-01-01',
+            endDate: '2023-12-31',
+            nextDate: '2099-01-15',
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const result = await service.getStats('user-1', 2024, 1);
+
+      expect(result.monthlyTotal).toBe(0);
+      expect(result.yearlyTotal).toBe(0);
+      expect(result.activeCount).toBe(0);
+    });
+
+    it('includes subscriptions that overlap the target month', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2024-01-01',
+            endDate: '2024-01-31',
+            nextDate: '2099-01-15',
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const result = await service.getStats('user-1', 2024, 1);
+
+      expect(result.monthlyTotal).toBe(100);
+      expect(result.yearlyTotal).toBe(1200);
+      expect(result.activeCount).toBe(1);
+    });
+
+    it('falls back to global behavior when year or month is missing or NaN', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2025-06-01',
+            endDate: null,
+            nextDate: '2099-06-15',
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const resultUndefined = await service.getStats('user-1');
+      const resultNaN = await service.getStats('user-1', NaN, 1);
+
+      expect(resultUndefined.monthlyTotal).toBe(100);
+      expect(resultUndefined.activeCount).toBe(1);
+      expect(resultNaN.monthlyTotal).toBe(100);
+      expect(resultNaN.activeCount).toBe(1);
+    });
+
+    it('computes nextRenewal over all active subscriptions regardless of month filter', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2025-06-01',
+            endDate: null,
+            nextDate: '2099-06-15',
+            description: 'Future subscription',
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const result = await service.getStats('user-1', 2024, 1);
+
+      expect(result.monthlyTotal).toBe(0);
+      expect(result.activeCount).toBe(0);
+      expect(result.nextRenewal).toEqual({
+        description: 'Future subscription',
+        date: '2099-06-15',
         daysUntil: expect.any(Number),
       });
     });
@@ -273,6 +394,76 @@ describe('SubscriptionsService', () => {
       expect(result).toEqual([
         { serviceType: 'streaming', monthlyTotal: 36, count: 2 },
         { serviceType: 'ai', monthlyTotal: 10, count: 1 },
+      ]);
+    });
+
+    it('applies the month overlap filter before grouping', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          serviceType: 'streaming',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2024-01-01',
+            endDate: '2024-01-31',
+          }),
+        }),
+        mockSubscription({
+          id: 'sub-2',
+          serviceType: 'streaming',
+          recurringTransaction: mockRecurring({
+            id: 'rec-2',
+            amount: 50,
+            frequency: 'monthly',
+            startDate: '2024-02-01',
+            endDate: null,
+          }),
+        }),
+        mockSubscription({
+          id: 'sub-3',
+          serviceType: 'ai',
+          recurringTransaction: mockRecurring({
+            id: 'rec-3',
+            amount: 120,
+            frequency: 'yearly',
+            startDate: '2023-01-01',
+            endDate: '2023-12-31',
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const result = await service.getByServiceType('user-1', 2024, 1);
+
+      expect(result).toEqual([
+        { serviceType: 'streaming', monthlyTotal: 100, count: 1 },
+      ]);
+    });
+
+    it('falls back to global behavior when year or month is missing or NaN', async () => {
+      const subs = [
+        mockSubscription({
+          id: 'sub-1',
+          serviceType: 'streaming',
+          recurringTransaction: mockRecurring({
+            amount: 100,
+            frequency: 'monthly',
+            startDate: '2025-06-01',
+            endDate: null,
+          }),
+        }),
+      ];
+      MockedSubscription.findAll.mockResolvedValue(subs as any);
+
+      const resultUndefined = await service.getByServiceType('user-1');
+      const resultNaN = await service.getByServiceType('user-1', NaN, 1);
+
+      expect(resultUndefined).toEqual([
+        { serviceType: 'streaming', monthlyTotal: 100, count: 1 },
+      ]);
+      expect(resultNaN).toEqual([
+        { serviceType: 'streaming', monthlyTotal: 100, count: 1 },
       ]);
     });
   });

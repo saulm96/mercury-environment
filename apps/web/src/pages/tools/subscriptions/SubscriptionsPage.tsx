@@ -246,7 +246,7 @@ export default function SubscriptionsPage() {
   const loadData = useCallback(() => {
     fetchSubscriptions();
     fetchStats(year, month + 1);
-    fetchServiceTypes();
+    fetchServiceTypes(year, month + 1);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);

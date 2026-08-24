@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { RecurringTransaction } from '@mercury/shared';
+import type { Transaction, RecurringTransaction } from '@mercury/shared';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useRecurringTransactions } from '@/hooks/useRecurringTransactions';
 import { useSubscriptions } from '@/hooks/useSubscriptions';
@@ -120,6 +120,11 @@ export default function TransactionsPage() {
     setEditingSeries(recurring);
   }
 
+  function handleEditSeriesFromModal(transaction: Transaction) {
+    closeModal();
+    handleEditSeries(transaction);
+  }
+
   async function handleUpdateSeries(data: RecurringTransactionFormData) {
     if (!editingSeries) return;
     await handleUpdateRecurring(editingSeries.id, data);
@@ -181,6 +186,7 @@ export default function TransactionsPage() {
             ? (data) => handleUpdate(modal.transaction!.id, data)
             : handleCreateTransaction
         }
+        onEditSeries={handleEditSeriesFromModal}
       />
 
       {showCategoryManager && (

@@ -171,6 +171,22 @@ describe('useSubscriptions', () => {
     expect(result.current.serviceTypeStats).toEqual(mockServiceTypeStats);
   });
 
+  it('fetchServiceTypes passes year and month when provided', async () => {
+    mockedApi.get.mockResolvedValue({ success: true, data: [] });
+
+    const { result } = renderHook(() => useSubscriptions());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    mockedApi.get.mockResolvedValue({ success: true, data: mockServiceTypeStats });
+
+    await act(async () => {
+      await result.current.fetchServiceTypes(2025, 8);
+    });
+
+    expect(mockedApi.get).toHaveBeenCalledWith('/subscriptions/service-types?year=2025&month=8');
+    expect(result.current.serviceTypeStats).toEqual(mockServiceTypeStats);
+  });
+
   it('fetchUpcoming loads upcoming renewals', async () => {
     mockedApi.get.mockResolvedValue({ success: true, data: [] });
 

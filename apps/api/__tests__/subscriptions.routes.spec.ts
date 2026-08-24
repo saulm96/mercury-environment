@@ -279,7 +279,21 @@ describe('Subscription Routes', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ success: true, data: stats });
-      expect(mockService.getByServiceType).toHaveBeenCalledWith('user-1');
+      expect(mockService.getByServiceType).toHaveBeenCalledWith('user-1', NaN, NaN);
+    });
+
+    it('passes parsed year and month query params to the service', async () => {
+      const stats = [{ serviceType: 'streaming', monthlyTotal: 36, count: 2 }];
+      mockService.getByServiceType.mockResolvedValue(stats);
+
+      const app = createApp();
+      const res = await request(app)
+        .get('/api/v1/subscriptions/service-types')
+        .query({ year: '2099', month: '1' });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ success: true, data: stats });
+      expect(mockService.getByServiceType).toHaveBeenCalledWith('user-1', 2099, 1);
     });
   });
 

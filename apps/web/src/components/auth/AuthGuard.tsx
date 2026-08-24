@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
+import { signOut } from '@/lib/auth';
 import type { User, ApiResponse } from '@mercury/shared';
 import styles from './AuthGuard.module.css';
 
@@ -21,11 +22,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
         await api.get<ApiResponse<User>>('/users/me');
         if (!cancelled) setIsValid(true);
       } catch {
-        try {
-          await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
-        } catch {
-          // ignore fetch errors during logout
-        }
+        await signOut();
         navigate('/');
       } finally {
         if (!cancelled) setIsChecking(false);

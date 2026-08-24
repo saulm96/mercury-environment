@@ -129,7 +129,7 @@ describe('SubscriptionsPage', () => {
     await waitFor(() => {
       expect(mockFetchStats).toHaveBeenCalled();
     });
-    expect(mockFetchServiceTypes).toHaveBeenCalled();
+    expect(mockFetchServiceTypes).toHaveBeenCalledWith(expect.any(Number), expect.any(Number));
     expect(mockFetchUpcoming).toHaveBeenCalled();
   });
 
@@ -228,6 +228,33 @@ describe('SubscriptionsPage', () => {
     });
 
     expect(mockHandleDelete).toHaveBeenCalledWith('sub-1');
+  });
+
+  it('refetches service types when navigating months', async () => {
+    renderPage();
+
+    await waitFor(() => {
+      expect(mockFetchServiceTypes).toHaveBeenCalled();
+    });
+
+    const initialCalls = mockFetchServiceTypes.mock.calls.length;
+    const [initialYear, initialMonth] = mockFetchServiceTypes.mock.calls[initialCalls - 1];
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next month' }));
+
+    await waitFor(() => {
+      expect(mockFetchServiceTypes.mock.calls.length).toBeGreaterThan(initialCalls);
+    });
+
+    const [newYear, newMonth] = mockFetchServiceTypes.mock.calls[mockFetchServiceTypes.mock.calls.length - 1];
+
+    if (initialMonth === 12) {
+      expect(newYear).toBe(initialYear + 1);
+      expect(newMonth).toBe(1);
+    } else {
+      expect(newYear).toBe(initialYear);
+      expect(newMonth).toBe(initialMonth + 1);
+    }
   });
 
   it('shows error state with retry button', () => {

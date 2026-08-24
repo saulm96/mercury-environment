@@ -10,7 +10,7 @@ interface UseSubscriptionsReturn {
   error: string | null;
   fetchSubscriptions: () => Promise<void>;
   fetchStats: (year: number, month: number) => Promise<void>;
-  fetchServiceTypes: () => Promise<void>;
+  fetchServiceTypes: (year?: number, month?: number) => Promise<void>;
   fetchUpcoming: (from: string, to: string) => Promise<void>;
   handleCreate: (data: { recurringTransactionId: string; serviceType: string }) => Promise<void>;
   handleUpdate: (id: string, data: { serviceType: string }) => Promise<void>;
@@ -86,11 +86,14 @@ export function useSubscriptions(): UseSubscriptionsReturn {
     }
   }, []);
 
-  const fetchServiceTypes = useCallback(async () => {
+  const fetchServiceTypes = useCallback(async (year?: number, month?: number) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<ApiResponse<ServiceTypeStat[]>>('/subscriptions/service-types');
+      const query = year !== undefined && month !== undefined ? `?year=${year}&month=${month}` : '';
+      const response = await api.get<ApiResponse<ServiceTypeStat[]>>(
+        `/subscriptions/service-types${query}`,
+      );
       const data = response.data ?? [];
       setServiceTypeStats(
         data.map((stat) => ({

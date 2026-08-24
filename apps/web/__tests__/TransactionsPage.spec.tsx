@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TransactionsPage from '../src/pages/tools/transactions/TransactionsPage';
-import type { Transaction, Category } from '@mercury/shared';
+import type { Transaction, Category, RecurringTransaction } from '@mercury/shared';
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -19,14 +19,15 @@ const mockTransaction: Transaction = {
   updatedAt: new Date('2025-06-15'),
 };
 
-const mockTransaction2: Transaction = {
+const mockRecurringTransaction: Transaction = {
   id: 'tx-2',
   userId: 'user-1',
-  type: 'income' as const,
-  amount: 1500,
-  description: 'Paycheck',
+  type: 'expense' as const,
+  amount: 9.99,
+  description: 'Streaming',
   date: '2025-06-01',
   categoryId: null,
+  recurringTransactionId: 'rt-1',
   createdAt: new Date('2025-06-01'),
   updatedAt: new Date('2025-06-01'),
 };
@@ -53,6 +54,25 @@ const mockCategories: Category[] = [
     updatedAt: new Date('2025-01-02'),
   },
 ];
+
+const mockRecurringTemplate: RecurringTransaction = {
+  id: 'rt-1',
+  userId: 'user-1',
+  type: 'expense' as const,
+  amount: 9.99,
+  description: 'Streaming',
+  frequency: 'monthly' as const,
+  interval: 1,
+  startDate: '2025-06-01',
+  endDate: null,
+  nextDate: '2025-07-01',
+  dayOfMonth: 1,
+  dayOfWeek: null,
+  categoryId: null,
+  status: 'active' as const,
+  createdAt: new Date('2025-06-01'),
+  updatedAt: new Date('2025-06-01'),
+};
 
 // ---------------------------------------------------------------------------
 // Shared mock state (mutated per test)
@@ -84,8 +104,59 @@ const mockUseTransactions = {
   closeModal: mockCloseModal,
 };
 
+const mockRecurringHandleCreate = jest.fn().mockResolvedValue(mockRecurringTemplate);
+const mockProcessDue = jest.fn().mockResolvedValue({ generated: 1, errors: [] });
+const mockRecurringHandleUpdate = jest.fn().mockResolvedValue(undefined);
+const mockRecurringHandleDelete = jest.fn().mockResolvedValue(undefined);
+const mockRecurringHandleSkip = jest.fn().mockResolvedValue(undefined);
+const mockRecurringHandleUnskip = jest.fn().mockResolvedValue(undefined);
+const mockRecurringResetCache = jest.fn();
+
+const mockUseRecurringTransactions = {
+  recurringTransactions: [] as RecurringTransaction[],
+  loading: false,
+  error: null as string | null,
+  fetchRecurringTransactions: jest.fn(),
+  processDue: mockProcessDue,
+  handleCreate: mockRecurringHandleCreate,
+  handleUpdate: mockRecurringHandleUpdate,
+  handleDelete: mockRecurringHandleDelete,
+  handleSkip: mockRecurringHandleSkip,
+  handleUnskip: mockRecurringHandleUnskip,
+  resetCache: mockRecurringResetCache,
+};
+
+const mockSubscriptionHandleCreate = jest.fn().mockResolvedValue(undefined);
+const mockSubscriptionHandleUpdate = jest.fn().mockResolvedValue(undefined);
+const mockSubscriptionHandleDelete = jest.fn().mockResolvedValue(undefined);
+
+const mockUseSubscriptions = {
+  subscriptions: [],
+  loading: false,
+  error: null as string | null,
+  fetchSubscriptions: jest.fn(),
+  fetchStats: jest.fn(),
+  fetchServiceTypes: jest.fn(),
+  fetchUpcoming: jest.fn(),
+  handleCreate: mockSubscriptionHandleCreate,
+  handleUpdate: mockSubscriptionHandleUpdate,
+  handleDelete: mockSubscriptionHandleDelete,
+  stats: null,
+  serviceTypeStats: [],
+  upcomingRenewals: [],
+  resetCache: jest.fn(),
+};
+
 jest.mock('../src/hooks/useTransactions', () => ({
   useTransactions: () => mockUseTransactions,
+}));
+
+jest.mock('../src/hooks/useRecurringTransactions', () => ({
+  useRecurringTransactions: () => mockUseRecurringTransactions,
+}));
+
+jest.mock('../src/hooks/useSubscriptions', () => ({
+  useSubscriptions: () => mockUseSubscriptions,
 }));
 
 jest.mock('../src/components/transactions/RecurringSyncProvider', () => ({
@@ -103,6 +174,9 @@ function resetMock() {
   mockUseTransactions.modal = { open: false };
   mockUseTransactions.categories = [];
   mockUseTransactions.categoriesLoading = false;
+
+  mockUseRecurringTransactions.recurringTransactions = [];
+
   jest.clearAllMocks();
 }
 
@@ -145,7 +219,6 @@ describe('TransactionsPage', () => {
       name: 'Manage Categories',
     });
     expect(categoryButton).toBeInTheDocument();
-    // BulletListIcon is an SVG rendered inside the button
     const svg = categoryButton.querySelector('svg');
     expect(svg).toBeInTheDocument();
   });
@@ -158,11 +231,6 @@ describe('TransactionsPage', () => {
 
     renderPage();
 
-    // When loading, 6 skeleton cards should be rendered inside the grid
-    // (each skeleton card is a div inside the grid div)
-    const skeletonCards = document.querySelectorAll('[class] div[class]');
-    // Since CSS modules are mocked to {}, the skeleton class names are empty.
-    // Instead, verify the empty state and error text are not present.
     expect(
       screen.queryByText('No transactions yet'),
     ).not.toBeInTheDocument();
@@ -189,13 +257,12 @@ describe('TransactionsPage', () => {
   // 5. Passes transactions data to TransactionCardList
   // -------------------------------------------------------------------------
   it('passes transactions data to TransactionCardList', () => {
-    mockUseTransactions.transactions = [mockTransaction, mockTransaction2];
+    mockUseTransactions.transactions = [mockTransaction, mockRecurringTransaction];
 
     renderPage();
 
-    // Transaction descriptions should appear in TransactionCard
     expect(screen.getByText('Groceries')).toBeInTheDocument();
-    expect(screen.getByText('Paycheck')).toBeInTheDocument();
+    expect(screen.getByText('Streaming')).toBeInTheDocument();
   });
 
   // -------------------------------------------------------------------------
@@ -217,9 +284,6 @@ describe('TransactionsPage', () => {
 
     renderPage();
 
-    // TransactionCard wraps the whole card in an onClick that calls onEdit.
-    // Since CSS modules are mocked to {}, the card div has no class attribute.
-    // The description <p> is a direct child of the card div, so climb via parentElement.
     const cardDescription = screen.getByText('Groceries');
     const card = cardDescription.parentElement!;
     fireEvent.click(card);
@@ -234,7 +298,6 @@ describe('TransactionsPage', () => {
   it('clicking "Manage Categories" opens the CategoryManager modal', () => {
     renderPage();
 
-    // Modal should NOT be visible initially
     expect(
       screen.queryByRole('dialog', { name: 'Manage Categories' }),
     ).not.toBeInTheDocument();
@@ -243,7 +306,6 @@ describe('TransactionsPage', () => {
       screen.getByRole('button', { name: 'Manage Categories' }),
     );
 
-    // Now the modal dialog should be visible
     const dialog = screen.getByRole('dialog', { name: 'Manage Categories' });
     expect(dialog).toBeInTheDocument();
     expect(dialog).toHaveAttribute('aria-modal', 'true');
@@ -255,7 +317,6 @@ describe('TransactionsPage', () => {
   it('clicking the modal overlay closes the CategoryManager modal', () => {
     renderPage();
 
-    // Open the modal
     fireEvent.click(
       screen.getByRole('button', { name: 'Manage Categories' }),
     );
@@ -263,7 +324,6 @@ describe('TransactionsPage', () => {
     const dialog = screen.getByRole('dialog', { name: 'Manage Categories' });
     expect(dialog).toBeInTheDocument();
 
-    // Click the overlay backdrop (the dialog div itself)
     fireEvent.click(dialog);
 
     expect(
@@ -277,7 +337,6 @@ describe('TransactionsPage', () => {
   it('clicking the close button closes the CategoryManager modal', () => {
     renderPage();
 
-    // Open the modal
     fireEvent.click(
       screen.getByRole('button', { name: 'Manage Categories' }),
     );
@@ -286,7 +345,6 @@ describe('TransactionsPage', () => {
       screen.getByRole('dialog', { name: 'Manage Categories' }),
     ).toBeInTheDocument();
 
-    // Click the close button inside the modal panel header
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
 
     expect(
@@ -302,16 +360,13 @@ describe('TransactionsPage', () => {
 
     renderPage();
 
-    // Open the CategoryManager modal
     fireEvent.click(
       screen.getByRole('button', { name: 'Manage Categories' }),
     );
 
-    // Category names from the mock categories should appear
     expect(screen.getByText('Food')).toBeInTheDocument();
     expect(screen.getByText('Salary')).toBeInTheDocument();
 
-    // The modal heading should be visible
     expect(
       screen.getByRole('heading', { name: 'Manage Categories' }),
     ).toBeInTheDocument();
@@ -326,10 +381,8 @@ describe('TransactionsPage', () => {
 
     renderPage();
 
-    // The TransactionModal renders a dialog when open
     const dialog = screen.getByRole('dialog');
     expect(dialog).toBeInTheDocument();
-    // In create mode, it should have "New Transaction" heading
     expect(
       screen.getByRole('heading', { name: 'New Transaction' }),
     ).toBeInTheDocument();
@@ -344,7 +397,6 @@ describe('TransactionsPage', () => {
 
     renderPage();
 
-    // Fill in required fields in the TransactionModal
     fireEvent.change(screen.getByLabelText('Amount'), {
       target: { value: '75.50' },
     });
@@ -352,12 +404,10 @@ describe('TransactionsPage', () => {
       target: { value: 'Dinner out' },
     });
 
-    // Click submit and wrap in act to handle the TransactionForm's async setIsSubmitting
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Create Transaction' }));
     });
 
-    // handleCreate should have been called with form data
     expect(mockHandleCreate).toHaveBeenCalledTimes(1);
     expect(mockHandleCreate).toHaveBeenCalledWith({
       type: 'expense',
@@ -366,5 +416,195 @@ describe('TransactionsPage', () => {
       date: expect.any(String),
       categoryId: undefined,
     });
+  });
+
+  // -------------------------------------------------------------------------
+  // 13. Creating a recurring transaction calls the recurring flow
+  // -------------------------------------------------------------------------
+  it('creating a recurring transaction calls handleCreateRecurring, processDue, and fetchTransactions', async () => {
+    mockUseTransactions.modal = { open: true };
+    mockUseTransactions.categories = mockCategories;
+
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText('Amount'), {
+      target: { value: '100' },
+    });
+    fireEvent.change(screen.getByLabelText('Description'), {
+      target: { value: 'Rent' },
+    });
+    fireEvent.change(screen.getByLabelText('Date'), {
+      target: { value: '2025-01-01' },
+    });
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Create Recurring' }));
+    });
+
+    expect(mockRecurringHandleCreate).toHaveBeenCalledTimes(1);
+    expect(mockRecurringHandleCreate).toHaveBeenCalledWith({
+      type: 'expense',
+      amount: 100,
+      description: 'Rent',
+      date: '2025-01-01',
+      frequency: 'monthly',
+      interval: 1,
+      categoryId: undefined,
+    });
+    expect(mockProcessDue).toHaveBeenCalledTimes(1);
+    expect(mockFetchTransactions).toHaveBeenCalledTimes(1);
+    expect(mockCloseModal).toHaveBeenCalledTimes(1);
+    expect(mockSubscriptionHandleCreate).not.toHaveBeenCalled();
+  });
+
+  // -------------------------------------------------------------------------
+  // 14. Creating a recurring + subscription transaction also creates a subscription
+  // -------------------------------------------------------------------------
+  it('creating a recurring subscription also calls handleCreateSubscription', async () => {
+    mockUseTransactions.modal = { open: true };
+    mockUseTransactions.categories = mockCategories;
+
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText('Amount'), {
+      target: { value: '15' },
+    });
+    fireEvent.change(screen.getByLabelText('Description'), {
+      target: { value: 'Netflix' },
+    });
+    fireEvent.change(screen.getByLabelText('Date'), {
+      target: { value: '2025-01-01' },
+    });
+    fireEvent.click(screen.getByLabelText('Recurring?'));
+    fireEvent.click(screen.getByLabelText('Mark as subscription'));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Create Recurring' }));
+    });
+
+    expect(mockRecurringHandleCreate).toHaveBeenCalledTimes(1);
+    expect(mockProcessDue).toHaveBeenCalledTimes(1);
+    expect(mockFetchTransactions).toHaveBeenCalledTimes(1);
+    expect(mockSubscriptionHandleCreate).toHaveBeenCalledTimes(1);
+    expect(mockSubscriptionHandleCreate).toHaveBeenCalledWith({
+      recurringTransactionId: mockRecurringTemplate.id,
+      serviceType: 'streaming',
+    });
+    expect(mockCloseModal).toHaveBeenCalledTimes(1);
+  });
+
+  // -------------------------------------------------------------------------
+  // 15. Clicking the recurring badge opens the series-edit modal
+  // -------------------------------------------------------------------------
+  it('clicking the recurring badge opens the series-edit modal', () => {
+    mockUseTransactions.transactions = [mockRecurringTransaction];
+    mockUseRecurringTransactions.recurringTransactions = [mockRecurringTemplate];
+
+    renderPage();
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit Recurring Series' }),
+    ).not.toBeInTheDocument();
+
+    const badge = screen.getByRole('button', { name: 'View recurring series' });
+    fireEvent.click(badge);
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit Recurring Series' });
+    expect(dialog).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Edit Recurring Series' }),
+    ).toBeInTheDocument();
+  });
+
+  // -------------------------------------------------------------------------
+  // 16. The series-edit modal shows the RecurringTransactionForm pre-filled
+  // -------------------------------------------------------------------------
+  it('pre-fills the series-edit modal with the recurring template data', () => {
+    mockUseTransactions.transactions = [mockRecurringTransaction];
+    mockUseRecurringTransactions.recurringTransactions = [mockRecurringTemplate];
+
+    renderPage();
+
+    fireEvent.click(screen.getByRole('button', { name: 'View recurring series' }));
+
+    const descriptionInput = screen.getByLabelText('Description') as HTMLInputElement;
+    expect(descriptionInput.value).toBe('Streaming');
+
+    const amountInput = screen.getByLabelText('Amount') as HTMLInputElement;
+    expect(amountInput.value).toBe('9.99');
+  });
+
+  // -------------------------------------------------------------------------
+  // 17. Saving the series-edit modal calls handleUpdateRecurring and refreshes
+  // -------------------------------------------------------------------------
+  it('saving the series-edit modal updates the recurring series and refreshes transactions', async () => {
+    mockUseTransactions.transactions = [mockRecurringTransaction];
+    mockUseRecurringTransactions.recurringTransactions = [mockRecurringTemplate];
+
+    renderPage();
+
+    fireEvent.click(screen.getByRole('button', { name: 'View recurring series' }));
+
+    fireEvent.change(screen.getByLabelText('Description'), {
+      target: { value: 'Updated Streaming' },
+    });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
+    });
+
+    expect(mockRecurringHandleUpdate).toHaveBeenCalledTimes(1);
+    expect(mockRecurringHandleUpdate).toHaveBeenCalledWith(
+      'rt-1',
+      expect.objectContaining({
+        description: 'Updated Streaming',
+      }),
+    );
+    expect(mockFetchTransactions).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit Recurring Series' }),
+    ).not.toBeInTheDocument();
+  });
+
+  // -------------------------------------------------------------------------
+  // 18a. Clicking "Edit series instead" in the occurrence modal opens the series-edit modal
+  // -------------------------------------------------------------------------
+  it('clicking "Edit series instead" closes the occurrence modal and opens the series-edit modal', () => {
+    mockUseTransactions.modal = { open: true, transaction: mockRecurringTransaction };
+    mockUseTransactions.categories = mockCategories;
+    mockUseRecurringTransactions.recurringTransactions = [mockRecurringTemplate];
+
+    renderPage();
+
+    expect(screen.getByRole('dialog', { name: 'Edit Transaction' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit series instead' }));
+
+    expect(mockCloseModal).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('dialog', { name: 'Edit Recurring Series' })).toBeInTheDocument();
+  });
+
+  // -------------------------------------------------------------------------
+  // 18. Deleting from the series-edit modal calls handleDeleteRecurring and refreshes
+  // -------------------------------------------------------------------------
+  it('deleting from the series-edit modal deletes the recurring series and refreshes transactions', async () => {
+    mockUseTransactions.transactions = [mockRecurringTransaction];
+    mockUseRecurringTransactions.recurringTransactions = [mockRecurringTemplate];
+
+    renderPage();
+
+    fireEvent.click(screen.getByRole('button', { name: 'View recurring series' }));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Delete series' }));
+    });
+
+    expect(mockRecurringHandleDelete).toHaveBeenCalledTimes(1);
+    expect(mockRecurringHandleDelete).toHaveBeenCalledWith('rt-1');
+    expect(mockFetchTransactions).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit Recurring Series' }),
+    ).not.toBeInTheDocument();
   });
 });

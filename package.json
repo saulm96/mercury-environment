@@ -6,6 +6,9 @@
     "apps/*",
     "packages/*"
   ],
+  "overrides": {
+    "@types/express": "^4.17.25"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

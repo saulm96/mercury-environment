@@ -1,23 +1,45 @@
 import { useState, useMemo } from 'react';
+import type { Transaction, RecurringTransaction } from '@mercury/shared';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useRecurringTransactions } from '@/hooks/useRecurringTransactions';
+import { useSubscriptions } from '@/hooks/useSubscriptions';
 import { useRecurringSync } from '@/components/transactions/RecurringSyncProvider';
 import { TransactionCardList } from '@/components/transactions/TransactionCardList';
 import { TransactionModal } from '@/components/transactions/TransactionModal';
+import { RecurringTransactionForm } from '@/components/transactions/RecurringTransactionForm';
+import type { RecurringTransactionFormData } from '@/components/transactions/RecurringTransactionForm';
+import type { TransactionFormData } from '@/components/transactions/TransactionForm';
 import { CategoryManager } from '@/components/categories/CategoryManager';
-import { useNavigate } from 'react-router-dom';
 import { BulletListIcon, CloseIcon } from '@/components/icons';
 import TransactionsSkeleton from './TransactionsSkeleton';
 import styles from './TransactionsPage.module.css';
 
+function mapRecurringToFormValues(
+  recurring: RecurringTransaction,
+): Partial<RecurringTransactionFormData> {
+  return {
+    type: recurring.type,
+    amount: recurring.amount,
+    description: recurring.description,
+    date: recurring.startDate,
+    frequency: recurring.frequency,
+    interval: recurring.interval,
+    endDate: recurring.endDate ?? undefined,
+    dayOfMonth: recurring.dayOfMonth ?? undefined,
+    dayOfWeek: recurring.dayOfWeek ?? undefined,
+    categoryId: recurring.categoryId ?? undefined,
+  };
+}
+
 export default function TransactionsPage() {
   const { ready } = useRecurringSync();
-  const navigate = useNavigate();
   const {
     transactions,
     loading,
     error,
     modal,
     categories,
+    fetchTransactions,
     handleCreate,
     handleUpdate,
     handleCreateCategory,
@@ -27,7 +49,19 @@ export default function TransactionsPage() {
     closeModal,
   } = useTransactions(ready);
 
+  const {
+    recurringTransactions,
+    handleCreate: handleCreateRecurring,
+    handleUpdate: handleUpdateRecurring,
+    handleDelete: handleDeleteRecurring,
+    processDue,
+  } = useRecurringTransactions();
+
+  const { handleCreate: handleCreateSubscription } = useSubscriptions();
+
   const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [editingSeries, setEditingSeries] = useState<RecurringTransaction | null>(null);
+  const [isDeletingSeries, setIsDeletingSeries] = useState(false);
 
   const transactionCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -39,9 +73,74 @@ export default function TransactionsPage() {
     return counts;
   }, [transactions]);
 
+  async function handleCreateTransaction(data: TransactionFormData) {
+    if (!data.isRecurring) {
+      await handleCreate(data);
+      return;
+    }
+
+    const recurringData: RecurringTransactionFormData = {
+      type: data.type,
+      amount: data.amount,
+      description: data.description,
+      date: data.date,
+      frequency: data.frequency!,
+      interval: data.interval ?? 1,
+      categoryId: data.categoryId,
+    };
+
+    if (data.endDate) {
+      recurringData.endDate = data.endDate;
+    }
+    if (data.frequency === 'monthly' && data.dayOfMonth) {
+      recurringData.dayOfMonth = data.dayOfMonth;
+    }
+    if (data.frequency === 'weekly' && data.dayOfWeek !== undefined) {
+      recurringData.dayOfWeek = data.dayOfWeek;
+    }
+
+    const created = await handleCreateRecurring(recurringData);
+    await processDue();
+    await fetchTransactions();
+
+    if (data.isSubscription && data.serviceType) {
+      await handleCreateSubscription({
+        recurringTransactionId: created.id,
+        serviceType: data.serviceType,
+      });
+    }
+
+    closeModal();
+  }
+
   function handleEditSeries(tx: { recurringTransactionId: string | null }) {
-    if (tx.recurringTransactionId) {
-      navigate('/economy/recurring');
+    if (!tx.recurringTransactionId) return;
+    const recurring = recurringTransactions.find((r) => r.id === tx.recurringTransactionId);
+    if (!recurring) return;
+    setEditingSeries(recurring);
+  }
+
+  function handleEditSeriesFromModal(transaction: Transaction) {
+    closeModal();
+    handleEditSeries(transaction);
+  }
+
+  async function handleUpdateSeries(data: RecurringTransactionFormData) {
+    if (!editingSeries) return;
+    await handleUpdateRecurring(editingSeries.id, data);
+    await fetchTransactions();
+    setEditingSeries(null);
+  }
+
+  async function handleDeleteSeries() {
+    if (!editingSeries) return;
+    setIsDeletingSeries(true);
+    try {
+      await handleDeleteRecurring(editingSeries.id);
+      await fetchTransactions();
+      setEditingSeries(null);
+    } finally {
+      setIsDeletingSeries(false);
     }
   }
 
@@ -85,8 +184,9 @@ export default function TransactionsPage() {
         onSubmit={
           modal.transaction
             ? (data) => handleUpdate(modal.transaction!.id, data)
-            : handleCreate
+            : handleCreateTransaction
         }
+        onEditSeries={handleEditSeriesFromModal}
       />
 
       {showCategoryManager && (
@@ -113,6 +213,47 @@ export default function TransactionsPage() {
               transactionCounts={transactionCounts}
               onCreateCategory={handleCreateCategory}
               onDeleteCategory={handleDeleteCategory}
+            />
+          </div>
+        </div>
+      )}
+
+      {editingSeries && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setEditingSeries(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Edit Recurring Series"
+        >
+          <div className={styles.modalPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalHeading}>Edit Recurring Series</h2>
+              <div className={styles.modalHeaderActions}>
+                <button
+                  type="button"
+                  onClick={handleDeleteSeries}
+                  disabled={isDeletingSeries}
+                  className={styles.deleteButton}
+                  aria-label="Delete series"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setEditingSeries(null)}
+                  className={styles.closeButton}
+                  aria-label="Close"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+            </div>
+            <RecurringTransactionForm
+              initialValues={mapRecurringToFormValues(editingSeries)}
+              categories={categories}
+              onCreateCategory={handleCreateCategory}
+              onSubmit={handleUpdateSeries}
+              onCancel={() => setEditingSeries(null)}
             />
           </div>
         </div>

@@ -116,8 +116,8 @@ describe('AuthGuard', () => {
     // Protected content should NOT be rendered
     expect(screen.queryByText('Protected content')).not.toBeInTheDocument();
 
-    // The logout endpoint should have been called
-    expect(mockFetch).toHaveBeenCalledWith('/auth/logout', {
+    // The logout endpoint should have been called with the absolute API origin
+    expect(mockFetch).toHaveBeenCalledWith('http://localhost:3001/auth/logout', {
       method: 'POST',
       credentials: 'include',
     });

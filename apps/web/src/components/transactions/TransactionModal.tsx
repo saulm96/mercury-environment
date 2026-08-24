@@ -10,6 +10,7 @@ interface TransactionModalProps {
   onCreateCategory: (name: string, type: 'income' | 'expense', color?: string) => Promise<Category>;
   onClose: () => void;
   onSubmit: (data: TransactionFormData) => Promise<void>;
+  onEditSeries?: (transaction: Transaction) => void;
 }
 
 export function TransactionModal({
@@ -19,6 +20,7 @@ export function TransactionModal({
   onCreateCategory,
   onClose,
   onSubmit,
+  onEditSeries,
 }: TransactionModalProps) {
   if (!isOpen) return null;
 
@@ -37,6 +39,23 @@ export function TransactionModal({
         <h2 className={styles.heading}>
           {transaction ? 'Edit Transaction' : 'New Transaction'}
         </h2>
+        {transaction && transaction.recurringTransactionId && (
+          <div className={styles.recurringHint}>
+            <p className={styles.recurringHintText}>
+              This transaction belongs to a recurring series. Changes here only
+              affect this occurrence.
+            </p>
+            {onEditSeries && (
+              <button
+                type="button"
+                onClick={() => transaction && onEditSeries(transaction)}
+                className={styles.editSeriesButton}
+              >
+                Edit series instead
+              </button>
+            )}
+          </div>
+        )}
         <TransactionForm
           initialValues={
             transaction

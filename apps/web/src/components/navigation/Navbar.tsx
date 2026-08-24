@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUser } from '@/hooks/useUser';
+import { signOut } from '@/lib/auth';
 import { UserMenu } from './UserMenu';
 import { HamburgerIcon } from '@/components/icons';
 import styles from './Navbar.module.css';
@@ -107,7 +108,7 @@ export function Navbar() {
                     </div>
                     <button
                       onClick={async () => {
-                        await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
+                        await signOut();
                         window.location.href = '/';
                       }}
                       className={styles.mobileSignOut}

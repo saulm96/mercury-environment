@@ -26,6 +26,12 @@ const mockTransactionIncome: Transaction = {
   updatedAt: new Date('2025-06-01'),
 };
 
+const mockRecurringTransaction: Transaction = {
+  ...mockTransaction,
+  id: 'txn-3',
+  recurringTransactionId: 'rt-1',
+};
+
 const mockCategories: Category[] = [
   {
     id: 'cat-1',
@@ -124,6 +130,55 @@ describe('TransactionModal', () => {
     expect(screen.getByRole('heading', { name: 'Edit Transaction' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save Changes' })).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Edit Transaction');
+  });
+
+  it('shows recurring series hint when editing an occurrence', () => {
+    render(
+      <TransactionModal
+        {...defaultProps}
+        isOpen={true}
+        transaction={mockRecurringTransaction}
+        onEditSeries={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText('This transaction belongs to a recurring series. Changes here only affect this occurrence.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit series instead' })).toBeInTheDocument();
+  });
+
+  it('does not show recurring series hint for a non-recurring transaction', () => {
+    render(
+      <TransactionModal
+        {...defaultProps}
+        isOpen={true}
+        transaction={mockTransaction}
+      />,
+    );
+
+    expect(
+      screen.queryByText('This transaction belongs to a recurring series.'),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit series instead' })).not.toBeInTheDocument();
+  });
+
+  it('calls onEditSeries when "Edit series instead" is clicked', () => {
+    const onEditSeries = jest.fn();
+
+    render(
+      <TransactionModal
+        {...defaultProps}
+        isOpen={true}
+        transaction={mockRecurringTransaction}
+        onEditSeries={onEditSeries}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit series instead' }));
+
+    expect(onEditSeries).toHaveBeenCalledTimes(1);
+    expect(onEditSeries).toHaveBeenCalledWith(mockRecurringTransaction);
   });
 
   // ---------------------------------------------------------------------------

@@ -11,7 +11,7 @@ interface UseRecurringTransactionsReturn {
   error: string | null;
   fetchRecurringTransactions: () => Promise<void>;
   processDue: () => Promise<{ generated: number; errors: string[] }>;
-  handleCreate: (data: RecurringTransactionFormData) => Promise<void>;
+  handleCreate: (data: RecurringTransactionFormData) => Promise<RecurringTransaction>;
   handleUpdate: (id: string, data: RecurringTransactionFormData) => Promise<void>;
   handleDelete: (id: string) => Promise<void>;
   handleSkip: (id: string, occurrenceDate: string) => Promise<void>;
@@ -72,12 +72,14 @@ export function useRecurringTransactions(): UseRecurringTransactionsReturn {
   }, []);
 
   const handleCreate = useCallback(
-    async (data: RecurringTransactionFormData) => {
+    async (data: RecurringTransactionFormData): Promise<RecurringTransaction> => {
       setError(null);
       try {
-        await api.post<ApiResponse<RecurringTransaction>>('/recurring-transactions', data);
+        const response = await api.post<ApiResponse<RecurringTransaction>>('/recurring-transactions', data);
+        const created = response.data as RecurringTransaction;
         resetRecurringTransactionsCache();
         await fetchRecurringTransactions();
+        return created;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
         setError(message);

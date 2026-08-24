@@ -148,7 +148,7 @@ describe('useRecurringTransactions', () => {
     expect(result.current.error).toBe('Processing failed');
   });
 
-  it('handleCreate posts a new recurring transaction and refetches', async () => {
+  it('handleCreate posts a new recurring transaction, returns it, and refetches', async () => {
     mockedApi.get.mockResolvedValue({ success: true, data: [mockRecurring] });
     mockedApi.post.mockResolvedValue({ success: true, data: mockRecurring2 });
 
@@ -157,8 +157,9 @@ describe('useRecurringTransactions', () => {
 
     mockedApi.get.mockResolvedValue({ success: true, data: [mockRecurring, mockRecurring2] });
 
+    let created: RecurringTransaction | undefined;
     await act(async () => {
-      await result.current.handleCreate({
+      created = await result.current.handleCreate({
         type: 'income',
         amount: 2500,
         description: 'Salary',
@@ -178,6 +179,7 @@ describe('useRecurringTransactions', () => {
       interval: 1,
       dayOfMonth: 15,
     });
+    expect(created).toEqual(mockRecurring2);
     expect(mockedApi.get).toHaveBeenCalledTimes(2);
     expect(result.current.recurringTransactions).toHaveLength(2);
   });

@@ -129,7 +129,7 @@ describe('Navbar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'User menu' }));
     fireEvent.click(screen.getByRole('button', { name: 'Sign Out' }));
 
-    expect(mockGlobalFetch).toHaveBeenCalledWith('/auth/logout', {
+    expect(mockGlobalFetch).toHaveBeenCalledWith('http://localhost:3001/auth/logout', {
       method: 'POST',
       credentials: 'include',
     });
